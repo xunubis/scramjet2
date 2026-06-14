@@ -17,6 +17,42 @@ const CORS_HEADERS: Record<string, string> = {
   "access-control-max-age": "7200",
 };
 
+const MAX_BARE_HEADER_VALUE = 3072;
+const STRIP_REQUEST_HEADERS = new Set([
+  "connection",
+  "content-length",
+  "host",
+  "keep-alive",
+  "proxy-authenticate",
+  "proxy-authorization",
+  "te",
+  "trailer",
+  "transfer-encoding",
+  "upgrade",
+]);
+const STRIP_RESPONSE_HEADERS = new Set([
+  "connection",
+  "content-encoding",
+  "content-length",
+  "content-security-policy",
+  "content-security-policy-report-only",
+  "cross-origin-embedder-policy",
+  "cross-origin-opener-policy",
+  "cross-origin-resource-policy",
+  "expect-ct",
+  "feature-policy",
+  "origin-isolation",
+  "strict-transport-security",
+  "transfer-encoding",
+  "upgrade-insecure-requests",
+  "x-content-type-options",
+  "x-download-options",
+  "x-frame-options",
+  "x-permitted-cross-domain-policies",
+  "x-powered-by",
+  "x-xss-protection",
+]);
+
 function jsonError(code: string, id: string, status = 400, message?: string) {
   return new Response(
     JSON.stringify({ code, id, message }),
@@ -76,6 +112,16 @@ function splitCommaHeader(value: string | null): string[] {
     .filter(Boolean);
 }
 
+function setSplitBareHeaders(headers: Headers, value: string) {
+  if (value.length <= MAX_BARE_HEADER_VALUE) {
+    headers.set("x-bare-headers", value);
+    return;
+  }
+  for (let i = 0, part = 0; i < value.length; i += MAX_BARE_HEADER_VALUE, part += 1) {
+    headers.set(`x-bare-headers-${part}`, `;${value.slice(i, i + MAX_BARE_HEADER_VALUE)}`);
+  }
+}
+
 async function handleProxy(request: Request): Promise<Response> {
   const targetUrl = request.headers.get("x-bare-url");
   const headersJson = readBareHeadersJson(request);
@@ -100,8 +146,9 @@ async function handleProxy(request: Request): Promise<Response> {
     const val = request.headers.get(name);
     if (val !== null) remoteHeaders[name] = val;
   }
-  delete remoteHeaders.host;
-  delete remoteHeaders["content-length"];
+  for (const name of Object.keys(remoteHeaders)) {
+    if (STRIP_REQUEST_HEADERS.has(name.toLowerCase())) delete remoteHeaders[name];
+  }
 
   let upstream: Response;
   try {
@@ -142,12 +189,10 @@ async function handleProxy(request: Request): Promise<Response> {
       delete remaining[lower];
     }
   }
-  // Drop transfer encoding / content length — the runtime sets those itself
-  // and forwarding them confuses downstream readers.
-  delete remaining["content-encoding"];
-  delete remaining["content-length"];
-  delete remaining["transfer-encoding"];
-  responseHeaders.set("x-bare-headers", JSON.stringify(remaining));
+  for (const name of Object.keys(remaining)) {
+    if (STRIP_RESPONSE_HEADERS.has(name.toLowerCase())) delete remaining[name];
+  }
+  setSplitBareHeaders(responseHeaders, JSON.stringify(remaining));
 
   const status = passStatus.includes(upstream.status) ? upstream.status : 200;
   return new Response(upstream.body, { status, headers: responseHeaders });

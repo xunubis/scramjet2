@@ -468,7 +468,7 @@ class ClientV3 extends Client {
     }
     async request(remote, method, body, headers, signal) {
         const options = {
-            credentials: "omit",
+            credentials: "same-origin",
             method: method,
             signal,
             //@ts-expect-error this exists but isnt typed ig
@@ -521,8 +521,7 @@ class ClientV3 extends Client {
         for (const status of passStatus) {
             headers.append("x-bare-pass-status", status.toString());
         }
-        splitHeaders(headers);
-        return headers;
+        return splitHeaders(headers);
     }
 }
 
