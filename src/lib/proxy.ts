@@ -158,25 +158,21 @@ export function ensureUltravioletReady(bareUrl: string): Promise<void> {
   if (uvPromise) return uvPromise;
   uvPromise = (async () => {
     if (!bareUrl) throw new Error("No bare server configured.");
+    // SW first — UV's bundle expects a controller to be live when it fetches.
+    await ensureServiceWorker();
     await loadScript("/baremux/index.js");
     await loadScript("/uv/uv.bundle.js");
     await loadScript("/uv/uv.config.js");
-    const conn = new window.BareMux.BareMuxConnection("/baremux/worker.js");
-    // Prefer epoxy (WASM, ~3x faster than libcurl) over wisp; fall back to
-    // bare-v3 if the wisp endpoint is unreachable. Same stack as the
-    // reference site (Injex v3 / dalen-kff.se).
-    try {
-      await conn.setTransport("/epoxy/index.mjs", [
-        { wisp: DEFAULT_WISP_URL },
-      ]);
-    } catch (e) {
-      console.warn("[prism] epoxy failed, falling back to bare-v3:", e);
-      await conn.setTransport("/baremod/index.mjs", [bareUrl]);
-    }
-    window.__prismBareConn = conn;
-    await ensureServiceWorker();
+    const conn = (window.__prismBareConn ??=
+      new window.BareMux.BareMuxConnection("/baremux/worker.js"));
+    // Use bare-v3 against our embedded /api/public/bare/ Worker endpoint.
+    // Epoxy/wisp was the source of intermittent "headers is not iterable"
+    // failures — bare-v3 over our own origin is the reliable path.
+    await conn.setTransport("/baremod/index.mjs", [bareUrl]);
+    console.info("[prism] UV ready — transport: bare-v3 ->", bareUrl);
   })().catch((err) => {
     uvPromise = null;
+    console.error("[prism] UV setup failed:", err);
     throw err;
   });
   return uvPromise;
