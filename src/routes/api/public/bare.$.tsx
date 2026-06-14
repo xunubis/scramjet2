@@ -105,12 +105,16 @@ async function handleProxy(request: Request): Promise<Response> {
 
   let upstream: Response;
   try {
-    upstream = await fetch(targetUrl, {
+    const hasBody = request.method !== "GET" && request.method !== "HEAD";
+    const init: RequestInit & { duplex?: "half" } = {
       method: request.method,
       headers: remoteHeaders,
-      body: request.method === "GET" || request.method === "HEAD" ? undefined : request.body,
+      body: hasBody ? request.body : undefined,
       redirect: "manual",
-    });
+    };
+    // Node 18+ / undici requires this whenever a streaming body is sent.
+    if (hasBody) init.duplex = "half";
+    upstream = await fetch(targetUrl, init);
   } catch (err) {
     return jsonError(
       "FETCH_FAILED",
