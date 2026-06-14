@@ -227,18 +227,9 @@ export function ensureScramjetReady(wispUrl: string): Promise<any> {
     const LibcurlClient: any = (window as any).__prismLibcurl;
     const transport = new LibcurlClient({ wisp: wispUrl });
 
-    // Share the bare-mux multiplexer: point its SharedWorker at the same
-    // epoxy/wisp transport. Now UV's fetches and Scramjet's network share
-    // one wisp connection pool through the bare-mux SharedWorker.
-    try {
-      await loadScript("/baremux/index.js");
-      if (!window.__prismBareConn) {
-        window.__prismBareConn = new window.BareMux.BareMuxConnection("/baremux/worker.js");
-      }
-      await window.__prismBareConn.setTransport("/epoxy/index.mjs", [{ wisp: wispUrl }]);
-    } catch (e) {
-      console.warn("[prism] bare-mux multiplexer setup for scramjet failed:", e);
-    }
+    // NOTE: Do NOT touch bare-mux here. Scramjet has its own libcurl
+    // transport; reconfiguring bare-mux would break UV's bare-v3 transport
+    // that ensureUltravioletReady set up.
 
     // 4. Construct the Controller and wait for it to handshake with the SW.
     const { Controller } = window.$scramjetController;
@@ -254,9 +245,11 @@ export function ensureScramjetReady(wispUrl: string): Promise<any> {
     });
     await controller.wait();
     window.__prismScramjetController = controller;
+    console.info("[prism] Scramjet ready — wisp:", wispUrl);
     return controller;
   })().catch((err) => {
     scramjetPromise = null;
+    console.error("[prism] Scramjet setup failed:", err);
     throw err;
   });
   return scramjetPromise;
