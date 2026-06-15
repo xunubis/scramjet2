@@ -862,11 +862,20 @@ function BlankTab({ onPick }: { onPick: (url: string) => void }) {
         }
       >
         <h1
-          className="select-none text-5xl font-bold tracking-tight text-foreground/90 sm:text-7xl"
-          style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.035em" }}
+          className="select-none text-6xl font-black tracking-tighter sm:text-8xl"
+          style={{
+            fontFamily: "var(--font-display)",
+            letterSpacing: "-0.06em",
+            background: "linear-gradient(180deg, oklch(0.98 0.01 250) 0%, oklch(0.7 0.02 250) 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
         >
-          Welcome to Prism
+          prism<span style={{ color: "var(--primary)", WebkitTextFillColor: "var(--primary)" }}>.</span>
         </h1>
+        <p className="mt-3 text-xs uppercase tracking-[0.4em] text-muted-foreground/60">
+          a quiet doorway to the rest of the internet
+        </p>
 
         <div className="relative mt-14 w-full">
           <form
