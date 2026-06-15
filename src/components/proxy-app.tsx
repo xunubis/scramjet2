@@ -666,43 +666,38 @@ function NavIconBtn({
 
 function SideRail({
   onHome,
-  onGames,
-  onApps,
-  onTools,
-  onDiscord,
   onSettings,
   onCloak,
 }: {
   onHome: () => void;
-  onGames: () => void;
-  onApps: () => void;
-  onTools: () => void;
-  onDiscord: () => void;
   onSettings: () => void;
   onCloak: () => void;
 }) {
-  const items: { label: string; icon: React.ReactNode; onClick: () => void }[] = [
-    { label: "Home",     icon: <HomeIcon className="h-5 w-5" />,       onClick: onHome },
-    { label: "Games",    icon: <Gamepad2 className="h-5 w-5" />,       onClick: onGames },
-    { label: "Apps",     icon: <Layers className="h-5 w-5" />,         onClick: onApps },
-    { label: "Tools",    icon: <Wrench className="h-5 w-5" />,         onClick: onTools },
-    { label: "Discord",  icon: <MessageCircle className="h-5 w-5" />,  onClick: onDiscord },
-    { label: "about:blank", icon: <EyeOff className="h-5 w-5" />,      onClick: onCloak },
-    { label: "Settings", icon: <SettingsIcon className="h-5 w-5" />,   onClick: onSettings },
-  ];
+  const linkCls =
+    "prism-smooth flex h-10 w-10 items-center justify-center rounded-xl text-muted-foreground hover:-translate-y-0.5 hover:bg-white/[0.06] hover:text-foreground";
   return (
     <nav className="absolute right-2 top-1/2 z-20 flex -translate-y-1/2 flex-col items-center gap-1 rounded-2xl border border-white/5 bg-black/40 p-2 backdrop-blur">
-      {items.map((it) => (
-        <button
-          key={it.label}
-          onClick={it.onClick}
-          aria-label={it.label}
-          title={it.label}
-          className="prism-smooth flex h-10 w-10 items-center justify-center rounded-xl text-muted-foreground hover:-translate-y-0.5 hover:bg-white/[0.06] hover:text-foreground"
-        >
-          {it.icon}
-        </button>
-      ))}
+      <button onClick={onHome} aria-label="Home" title="Home" className={linkCls}>
+        <HomeIcon className="h-5 w-5" />
+      </button>
+      <Link to="/games" aria-label="Games" title="Games" className={linkCls}>
+        <Gamepad2 className="h-5 w-5" />
+      </Link>
+      <Link to="/apps" aria-label="Apps" title="Apps" className={linkCls}>
+        <Layers className="h-5 w-5" />
+      </Link>
+      <Link to="/tools" aria-label="Tools" title="Tools" className={linkCls}>
+        <Wrench className="h-5 w-5" />
+      </Link>
+      <Link to="/discord" aria-label="Community" title="Community" className={linkCls}>
+        <MessageCircle className="h-5 w-5" />
+      </Link>
+      <button onClick={onCloak} aria-label="about:blank" title="about:blank" className={linkCls}>
+        <EyeOff className="h-5 w-5" />
+      </button>
+      <button onClick={onSettings} aria-label="Settings" title="Settings" className={linkCls}>
+        <SettingsIcon className="h-5 w-5" />
+      </button>
     </nav>
   );
 }
