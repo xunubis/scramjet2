@@ -1143,13 +1143,50 @@ function SettingsSheet({
             </div>
           </div>
 
-          <button
-            onClick={() => openAboutBlank()}
-            className="prism-smooth flex w-full items-center justify-center gap-2 rounded-md border border-border/60 px-3 py-2 text-sm text-muted-foreground hover:bg-secondary"
-          >
-            <ExternalLink className="h-4 w-4" />
-            Open in about:blank
-          </button>
+          {/* Advanced behavior — 15 cloaking / stealth toggles */}
+          <div>
+            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Stealth & behavior
+            </label>
+            <div className="mt-2 grid grid-cols-1 gap-1.5 rounded-md border border-border/60 p-2">
+              {BEHAVIOR_TOGGLES.map((bt) => (
+                <label
+                  key={bt.key}
+                  className="flex cursor-pointer items-start justify-between gap-3 rounded px-2 py-1.5 hover:bg-secondary/40"
+                >
+                  <div className="min-w-0">
+                    <p className="text-xs">{bt.label}</p>
+                    <p className="text-[10px] text-muted-foreground">{bt.help}</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={behavior[bt.key]}
+                    onChange={(e) =>
+                      onBehaviorChange({ ...behavior, [bt.key]: e.target.checked })
+                    }
+                    className="mt-1 h-4 w-4 shrink-0 accent-primary"
+                  />
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => openAboutBlank()}
+              className="prism-smooth flex items-center justify-center gap-2 rounded-md border border-border/60 px-3 py-2 text-xs text-muted-foreground hover:bg-secondary"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              about:blank
+            </button>
+            <button
+              onClick={() => openBlob()}
+              className="prism-smooth flex items-center justify-center gap-2 rounded-md border border-border/60 px-3 py-2 text-xs text-muted-foreground hover:bg-secondary"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              blob: launcher
+            </button>
+          </div>
 
           <div className="flex items-center justify-between rounded-md border border-border/60 px-3 py-2.5">
             <div>
