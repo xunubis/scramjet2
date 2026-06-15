@@ -931,21 +931,25 @@ function SettingsSheet({
   cloak,
   panic,
   bookmarks,
+  behavior,
   onClose,
   onSave,
   onCloakChange,
   onPanicChange,
   onBookmarksChange,
+  onBehaviorChange,
 }: {
   settings: ProxySettings;
   cloak: CloakConfig;
   panic: PanicConfig;
   bookmarks: Bookmark[];
+  behavior: BehaviorConfig;
   onClose: () => void;
   onSave: (s: ProxySettings) => void;
   onCloakChange: (c: CloakConfig) => void;
   onPanicChange: (p: PanicConfig) => void;
   onBookmarksChange: (b: Bookmark[]) => void;
+  onBehaviorChange: (b: BehaviorConfig) => void;
 }) {
   const [draft, setDraft] = useState(settings);
   const [clearing, setClearing] = useState(false);
