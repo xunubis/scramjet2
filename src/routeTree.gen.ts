@@ -9,10 +9,34 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ToolsRouteImport } from './routes/tools'
+import { Route as GamesRouteImport } from './routes/games'
+import { Route as DiscordRouteImport } from './routes/discord'
+import { Route as AppsRouteImport } from './routes/apps'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicSuggestRouteImport } from './routes/api/public/suggest'
 import { Route as ApiPublicBareSplatRouteImport } from './routes/api/public/bare.$'
 
+const ToolsRoute = ToolsRouteImport.update({
+  id: '/tools',
+  path: '/tools',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GamesRoute = GamesRouteImport.update({
+  id: '/games',
+  path: '/games',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscordRoute = DiscordRouteImport.update({
+  id: '/discord',
+  path: '/discord',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppsRoute = AppsRouteImport.update({
+  id: '/apps',
+  path: '/apps',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,36 +55,102 @@ const ApiPublicBareSplatRoute = ApiPublicBareSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/apps': typeof AppsRoute
+  '/discord': typeof DiscordRoute
+  '/games': typeof GamesRoute
+  '/tools': typeof ToolsRoute
   '/api/public/suggest': typeof ApiPublicSuggestRoute
   '/api/public/bare/$': typeof ApiPublicBareSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/apps': typeof AppsRoute
+  '/discord': typeof DiscordRoute
+  '/games': typeof GamesRoute
+  '/tools': typeof ToolsRoute
   '/api/public/suggest': typeof ApiPublicSuggestRoute
   '/api/public/bare/$': typeof ApiPublicBareSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/apps': typeof AppsRoute
+  '/discord': typeof DiscordRoute
+  '/games': typeof GamesRoute
+  '/tools': typeof ToolsRoute
   '/api/public/suggest': typeof ApiPublicSuggestRoute
   '/api/public/bare/$': typeof ApiPublicBareSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/public/suggest' | '/api/public/bare/$'
+  fullPaths:
+    | '/'
+    | '/apps'
+    | '/discord'
+    | '/games'
+    | '/tools'
+    | '/api/public/suggest'
+    | '/api/public/bare/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/suggest' | '/api/public/bare/$'
-  id: '__root__' | '/' | '/api/public/suggest' | '/api/public/bare/$'
+  to:
+    | '/'
+    | '/apps'
+    | '/discord'
+    | '/games'
+    | '/tools'
+    | '/api/public/suggest'
+    | '/api/public/bare/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/apps'
+    | '/discord'
+    | '/games'
+    | '/tools'
+    | '/api/public/suggest'
+    | '/api/public/bare/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppsRoute: typeof AppsRoute
+  DiscordRoute: typeof DiscordRoute
+  GamesRoute: typeof GamesRoute
+  ToolsRoute: typeof ToolsRoute
   ApiPublicSuggestRoute: typeof ApiPublicSuggestRoute
   ApiPublicBareSplatRoute: typeof ApiPublicBareSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tools': {
+      id: '/tools'
+      path: '/tools'
+      fullPath: '/tools'
+      preLoaderRoute: typeof ToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/games': {
+      id: '/games'
+      path: '/games'
+      fullPath: '/games'
+      preLoaderRoute: typeof GamesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discord': {
+      id: '/discord'
+      path: '/discord'
+      fullPath: '/discord'
+      preLoaderRoute: typeof DiscordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apps': {
+      id: '/apps'
+      path: '/apps'
+      fullPath: '/apps'
+      preLoaderRoute: typeof AppsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -87,6 +177,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppsRoute: AppsRoute,
+  DiscordRoute: DiscordRoute,
+  GamesRoute: GamesRoute,
+  ToolsRoute: ToolsRoute,
   ApiPublicSuggestRoute: ApiPublicSuggestRoute,
   ApiPublicBareSplatRoute: ApiPublicBareSplatRoute,
 }

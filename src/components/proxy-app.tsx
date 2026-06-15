@@ -35,20 +35,27 @@ import {
   updateBareTransport,
 } from "@/lib/proxy";
 import {
+  applyBehavior,
   applyCloak,
   CLOAK_PRESETS,
+  type BehaviorConfig,
   type Bookmark,
   type CloakConfig,
   type CloakPreset,
+  DEFAULT_BEHAVIOR,
   type PanicConfig,
+  loadBehavior,
   loadBookmarks,
   loadCloak,
   loadPanic,
   openAboutBlank,
+  openBlob,
+  saveBehavior,
   saveBookmarks,
   saveCloak,
   savePanic,
 } from "@/lib/prism-features";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 
 interface Tab {
   id: string;
@@ -76,6 +83,25 @@ function newTab(engine: ProxyEngine): Tab {
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+const BEHAVIOR_TOGGLES: { key: keyof BehaviorConfig; label: string; help: string }[] = [
+  { key: "stealthMode",          label: "Stealth mode",         help: "Combo: enforces anti-close + devtools panic + obfuscation." },
+  { key: "autoCloakOnBlur",      label: "Cloak on tab blur",    help: "Swap to a blank title/icon when you switch tabs." },
+  { key: "antiClose",            label: "Confirm before close", help: "Browser asks before closing the tab." },
+  { key: "obfuscateStorage",     label: "Obfuscate storage",    help: "XOR-encode localStorage entries so devtools shows noise." },
+  { key: "scrubReferrer",        label: "Scrub referrer",       help: "Sends no Referer header from the host doc." },
+  { key: "stripMetaTags",        label: "Strip share metadata", help: "Removes og:* / twitter:* / author / generator tags." },
+  { key: "devtoolsPanic",        label: "DevTools panic",       help: "Auto-redirect when devtools is detected open." },
+  { key: "blockRightClickGuard", label: "Block right-click",    help: "Stops the native context menu over Prism chrome." },
+  { key: "randomizeFavicon",     label: "Rotate favicon",       help: "Swaps the favicon every few seconds." },
+  { key: "rotatingTitle",        label: "Rotate page title",    help: "Cycles through cloak titles to defeat screenshots." },
+  { key: "autoAboutBlankOnLoad", label: "Auto about:blank",     help: "Opens itself in about:blank once per session." },
+  { key: "hideHistory",          label: "Suppress history",     help: "Hides routes from browser history when possible." },
+  { key: "noNewTabHistory",      label: "No-history popups",    help: "Uses noopener+noreferrer for outgoing tabs." },
+  { key: "fakeOfflineMode",      label: "Fake offline",         help: "Reports navigator.onLine=false to embedded pages." },
+  { key: "superClean",           label: "Auto-clear session",   help: "Wipes sessionStorage every 60 seconds." },
+];
+
+
 export function ProxyApp() {
   const [settings, setSettings] = useState<ProxySettings>(DEFAULT_SETTINGS);
   const [tabs, setTabs] = useState<Tab[]>([]);
@@ -84,6 +110,9 @@ export function ProxyApp() {
   const [cloak, setCloak] = useState<CloakConfig>({ preset: "none" });
   const [panic, setPanic] = useState<PanicConfig>({ key: "`", url: "https://classroom.google.com/" });
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [behavior, setBehavior] = useState<BehaviorConfig>(DEFAULT_BEHAVIOR);
+  const search = useSearch({ from: "/" });
+  const routerNavigate = useNavigate();
 
   const iframeRefs = useRef<Record<string, HTMLIFrameElement | null>>({});
   /** scramjet Frame instances per tab id */
@@ -95,14 +124,31 @@ export function ProxyApp() {
     const first = newTab(s.defaultEngine);
     setTabs([first]);
     setActiveId(first.id);
-    // Pre-warm BOTH engines so first navigation and engine switches feel instant.
     prewarmEngines(s);
     const c = loadCloak();
     setCloak(c);
     applyCloak(c);
-    setPanic(loadPanic());
+    const p = loadPanic();
+    setPanic(p);
     setBookmarks(loadBookmarks());
+    const b = loadBehavior();
+    setBehavior(b);
+    applyBehavior(b, p);
   }, []);
+
+  // Re-apply behavior whenever it (or the panic url) changes.
+  useEffect(() => {
+    applyBehavior(behavior, panic);
+  }, [behavior, panic]);
+
+  // Honor ?go=<url> deep links from internal pages (Games/Apps/Tools).
+  useEffect(() => {
+    if (search.go && activeId) {
+      navigate(activeId, search.go);
+      routerNavigate({ to: "/", search: {}, replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.go, activeId]);
 
   // Panic key — instantly redirects the whole window away from Prism.
   useEffect(() => {
@@ -375,10 +421,6 @@ export function ProxyApp() {
       <SideRail
         onHome={() => activeTab && home(activeTab.id)}
         onSettings={() => setSettingsOpen(true)}
-        onGames={() => activeTab && navigate(activeTab.id, "https://now.gg")}
-        onApps={() => activeTab && navigate(activeTab.id, "https://github.com/topics/proxy")}
-        onTools={() => activeTab && navigate(activeTab.id, "https://duckduckgo.com")}
-        onDiscord={() => activeTab && navigate(activeTab.id, "https://discord.com")}
         onCloak={() => openAboutBlank()}
       />
 
@@ -388,6 +430,7 @@ export function ProxyApp() {
           cloak={cloak}
           panic={panic}
           bookmarks={bookmarks}
+          behavior={behavior}
           onClose={() => setSettingsOpen(false)}
           onSave={(s) => {
             setSettings(s);
@@ -406,6 +449,10 @@ export function ProxyApp() {
           onBookmarksChange={(b) => {
             setBookmarks(b);
             saveBookmarks(b);
+          }}
+          onBehaviorChange={(b) => {
+            setBehavior(b);
+            saveBehavior(b);
           }}
         />
       )}
@@ -638,43 +685,38 @@ function NavIconBtn({
 
 function SideRail({
   onHome,
-  onGames,
-  onApps,
-  onTools,
-  onDiscord,
   onSettings,
   onCloak,
 }: {
   onHome: () => void;
-  onGames: () => void;
-  onApps: () => void;
-  onTools: () => void;
-  onDiscord: () => void;
   onSettings: () => void;
   onCloak: () => void;
 }) {
-  const items: { label: string; icon: React.ReactNode; onClick: () => void }[] = [
-    { label: "Home",     icon: <HomeIcon className="h-5 w-5" />,       onClick: onHome },
-    { label: "Games",    icon: <Gamepad2 className="h-5 w-5" />,       onClick: onGames },
-    { label: "Apps",     icon: <Layers className="h-5 w-5" />,         onClick: onApps },
-    { label: "Tools",    icon: <Wrench className="h-5 w-5" />,         onClick: onTools },
-    { label: "Discord",  icon: <MessageCircle className="h-5 w-5" />,  onClick: onDiscord },
-    { label: "about:blank", icon: <EyeOff className="h-5 w-5" />,      onClick: onCloak },
-    { label: "Settings", icon: <SettingsIcon className="h-5 w-5" />,   onClick: onSettings },
-  ];
+  const linkCls =
+    "prism-smooth flex h-10 w-10 items-center justify-center rounded-xl text-muted-foreground hover:-translate-y-0.5 hover:bg-white/[0.06] hover:text-foreground";
   return (
     <nav className="absolute right-2 top-1/2 z-20 flex -translate-y-1/2 flex-col items-center gap-1 rounded-2xl border border-white/5 bg-black/40 p-2 backdrop-blur">
-      {items.map((it) => (
-        <button
-          key={it.label}
-          onClick={it.onClick}
-          aria-label={it.label}
-          title={it.label}
-          className="prism-smooth flex h-10 w-10 items-center justify-center rounded-xl text-muted-foreground hover:-translate-y-0.5 hover:bg-white/[0.06] hover:text-foreground"
-        >
-          {it.icon}
-        </button>
-      ))}
+      <button onClick={onHome} aria-label="Home" title="Home" className={linkCls}>
+        <HomeIcon className="h-5 w-5" />
+      </button>
+      <Link to="/games" aria-label="Games" title="Games" className={linkCls}>
+        <Gamepad2 className="h-5 w-5" />
+      </Link>
+      <Link to="/apps" aria-label="Apps" title="Apps" className={linkCls}>
+        <Layers className="h-5 w-5" />
+      </Link>
+      <Link to="/tools" aria-label="Tools" title="Tools" className={linkCls}>
+        <Wrench className="h-5 w-5" />
+      </Link>
+      <Link to="/discord" aria-label="Community" title="Community" className={linkCls}>
+        <MessageCircle className="h-5 w-5" />
+      </Link>
+      <button onClick={onCloak} aria-label="about:blank" title="about:blank" className={linkCls}>
+        <EyeOff className="h-5 w-5" />
+      </button>
+      <button onClick={onSettings} aria-label="Settings" title="Settings" className={linkCls}>
+        <SettingsIcon className="h-5 w-5" />
+      </button>
     </nav>
   );
 }
@@ -820,11 +862,20 @@ function BlankTab({ onPick }: { onPick: (url: string) => void }) {
         }
       >
         <h1
-          className="select-none text-5xl font-bold tracking-tight text-foreground/90 sm:text-7xl"
-          style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.035em" }}
+          className="select-none text-6xl font-black tracking-tighter sm:text-8xl"
+          style={{
+            fontFamily: "var(--font-display)",
+            letterSpacing: "-0.06em",
+            background: "linear-gradient(180deg, oklch(0.98 0.01 250) 0%, oklch(0.7 0.02 250) 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
         >
-          Welcome to Prism
+          prism<span style={{ color: "var(--primary)", WebkitTextFillColor: "var(--primary)" }}>.</span>
         </h1>
+        <p className="mt-3 text-xs uppercase tracking-[0.4em] text-muted-foreground/60">
+          a quiet doorway to the rest of the internet
+        </p>
 
         <div className="relative mt-14 w-full">
           <form
@@ -908,21 +959,25 @@ function SettingsSheet({
   cloak,
   panic,
   bookmarks,
+  behavior,
   onClose,
   onSave,
   onCloakChange,
   onPanicChange,
   onBookmarksChange,
+  onBehaviorChange,
 }: {
   settings: ProxySettings;
   cloak: CloakConfig;
   panic: PanicConfig;
   bookmarks: Bookmark[];
+  behavior: BehaviorConfig;
   onClose: () => void;
   onSave: (s: ProxySettings) => void;
   onCloakChange: (c: CloakConfig) => void;
   onPanicChange: (p: PanicConfig) => void;
   onBookmarksChange: (b: Bookmark[]) => void;
+  onBehaviorChange: (b: BehaviorConfig) => void;
 }) {
   const [draft, setDraft] = useState(settings);
   const [clearing, setClearing] = useState(false);
@@ -1116,13 +1171,50 @@ function SettingsSheet({
             </div>
           </div>
 
-          <button
-            onClick={() => openAboutBlank()}
-            className="prism-smooth flex w-full items-center justify-center gap-2 rounded-md border border-border/60 px-3 py-2 text-sm text-muted-foreground hover:bg-secondary"
-          >
-            <ExternalLink className="h-4 w-4" />
-            Open in about:blank
-          </button>
+          {/* Advanced behavior — 15 cloaking / stealth toggles */}
+          <div>
+            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Stealth & behavior
+            </label>
+            <div className="mt-2 grid grid-cols-1 gap-1.5 rounded-md border border-border/60 p-2">
+              {BEHAVIOR_TOGGLES.map((bt) => (
+                <label
+                  key={bt.key}
+                  className="flex cursor-pointer items-start justify-between gap-3 rounded px-2 py-1.5 hover:bg-secondary/40"
+                >
+                  <div className="min-w-0">
+                    <p className="text-xs">{bt.label}</p>
+                    <p className="text-[10px] text-muted-foreground">{bt.help}</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={behavior[bt.key]}
+                    onChange={(e) =>
+                      onBehaviorChange({ ...behavior, [bt.key]: e.target.checked })
+                    }
+                    className="mt-1 h-4 w-4 shrink-0 accent-primary"
+                  />
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => openAboutBlank()}
+              className="prism-smooth flex items-center justify-center gap-2 rounded-md border border-border/60 px-3 py-2 text-xs text-muted-foreground hover:bg-secondary"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              about:blank
+            </button>
+            <button
+              onClick={() => openBlob()}
+              className="prism-smooth flex items-center justify-center gap-2 rounded-md border border-border/60 px-3 py-2 text-xs text-muted-foreground hover:bg-secondary"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              blob: launcher
+            </button>
+          </div>
 
           <div className="flex items-center justify-between rounded-md border border-border/60 px-3 py-2.5">
             <div>
