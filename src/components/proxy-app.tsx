@@ -91,6 +91,9 @@ export function ProxyApp() {
   const [cloak, setCloak] = useState<CloakConfig>({ preset: "none" });
   const [panic, setPanic] = useState<PanicConfig>({ key: "`", url: "https://classroom.google.com/" });
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [behavior, setBehavior] = useState<BehaviorConfig>(DEFAULT_BEHAVIOR);
+  const search = useSearch({ from: "/" });
+  const navigate = useNavigate();
 
   const iframeRefs = useRef<Record<string, HTMLIFrameElement | null>>({});
   /** scramjet Frame instances per tab id */
