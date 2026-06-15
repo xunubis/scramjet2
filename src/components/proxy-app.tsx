@@ -35,20 +35,27 @@ import {
   updateBareTransport,
 } from "@/lib/proxy";
 import {
+  applyBehavior,
   applyCloak,
   CLOAK_PRESETS,
+  type BehaviorConfig,
   type Bookmark,
   type CloakConfig,
   type CloakPreset,
+  DEFAULT_BEHAVIOR,
   type PanicConfig,
+  loadBehavior,
   loadBookmarks,
   loadCloak,
   loadPanic,
   openAboutBlank,
+  openBlob,
+  saveBehavior,
   saveBookmarks,
   saveCloak,
   savePanic,
 } from "@/lib/prism-features";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 
 interface Tab {
   id: string;
