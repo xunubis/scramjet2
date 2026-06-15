@@ -402,10 +402,6 @@ export function ProxyApp() {
       <SideRail
         onHome={() => activeTab && home(activeTab.id)}
         onSettings={() => setSettingsOpen(true)}
-        onGames={() => activeTab && navigate(activeTab.id, "https://now.gg")}
-        onApps={() => activeTab && navigate(activeTab.id, "https://github.com/topics/proxy")}
-        onTools={() => activeTab && navigate(activeTab.id, "https://duckduckgo.com")}
-        onDiscord={() => activeTab && navigate(activeTab.id, "https://discord.com")}
         onCloak={() => openAboutBlank()}
       />
 
@@ -415,6 +411,7 @@ export function ProxyApp() {
           cloak={cloak}
           panic={panic}
           bookmarks={bookmarks}
+          behavior={behavior}
           onClose={() => setSettingsOpen(false)}
           onSave={(s) => {
             setSettings(s);
@@ -433,6 +430,10 @@ export function ProxyApp() {
           onBookmarksChange={(b) => {
             setBookmarks(b);
             saveBookmarks(b);
+          }}
+          onBehaviorChange={(b) => {
+            setBehavior(b);
+            saveBehavior(b);
           }}
         />
       )}
