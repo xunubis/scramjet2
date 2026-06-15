@@ -105,14 +105,31 @@ export function ProxyApp() {
     const first = newTab(s.defaultEngine);
     setTabs([first]);
     setActiveId(first.id);
-    // Pre-warm BOTH engines so first navigation and engine switches feel instant.
     prewarmEngines(s);
     const c = loadCloak();
     setCloak(c);
     applyCloak(c);
-    setPanic(loadPanic());
+    const p = loadPanic();
+    setPanic(p);
     setBookmarks(loadBookmarks());
+    const b = loadBehavior();
+    setBehavior(b);
+    applyBehavior(b, p);
   }, []);
+
+  // Re-apply behavior whenever it (or the panic url) changes.
+  useEffect(() => {
+    applyBehavior(behavior, panic);
+  }, [behavior, panic]);
+
+  // Honor ?go=<url> deep links from internal pages (Games/Apps/Tools).
+  useEffect(() => {
+    if (search.go && activeId) {
+      navigate(activeId, search.go);
+      routerNavigate({ to: "/", search: {}, replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.go, activeId]);
 
   // Panic key — instantly redirects the whole window away from Prism.
   useEffect(() => {
