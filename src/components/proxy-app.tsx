@@ -83,6 +83,25 @@ function newTab(engine: ProxyEngine): Tab {
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+const BEHAVIOR_TOGGLES: { key: keyof BehaviorConfig; label: string; help: string }[] = [
+  { key: "stealthMode",          label: "Stealth mode",         help: "Combo: enforces anti-close + devtools panic + obfuscation." },
+  { key: "autoCloakOnBlur",      label: "Cloak on tab blur",    help: "Swap to a blank title/icon when you switch tabs." },
+  { key: "antiClose",            label: "Confirm before close", help: "Browser asks before closing the tab." },
+  { key: "obfuscateStorage",     label: "Obfuscate storage",    help: "XOR-encode localStorage entries so devtools shows noise." },
+  { key: "scrubReferrer",        label: "Scrub referrer",       help: "Sends no Referer header from the host doc." },
+  { key: "stripMetaTags",        label: "Strip share metadata", help: "Removes og:* / twitter:* / author / generator tags." },
+  { key: "devtoolsPanic",        label: "DevTools panic",       help: "Auto-redirect when devtools is detected open." },
+  { key: "blockRightClickGuard", label: "Block right-click",    help: "Stops the native context menu over Prism chrome." },
+  { key: "randomizeFavicon",     label: "Rotate favicon",       help: "Swaps the favicon every few seconds." },
+  { key: "rotatingTitle",        label: "Rotate page title",    help: "Cycles through cloak titles to defeat screenshots." },
+  { key: "autoAboutBlankOnLoad", label: "Auto about:blank",     help: "Opens itself in about:blank once per session." },
+  { key: "hideHistory",          label: "Suppress history",     help: "Hides routes from browser history when possible." },
+  { key: "noNewTabHistory",      label: "No-history popups",    help: "Uses noopener+noreferrer for outgoing tabs." },
+  { key: "fakeOfflineMode",      label: "Fake offline",         help: "Reports navigator.onLine=false to embedded pages." },
+  { key: "superClean",           label: "Auto-clear session",   help: "Wipes sessionStorage every 60 seconds." },
+];
+
+
 export function ProxyApp() {
   const [settings, setSettings] = useState<ProxySettings>(DEFAULT_SETTINGS);
   const [tabs, setTabs] = useState<Tab[]>([]);
