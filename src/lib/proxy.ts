@@ -20,13 +20,28 @@
 
 export type ProxyEngine = "uv" | "scramjet";
 
-export type PrismAccent = "mint" | "violet" | "amber" | "rose";
+export type PrismAccent =
+  | "mint" | "violet" | "amber" | "rose"
+  | "sky" | "emerald" | "crimson" | "indigo"
+  | "lime" | "cyan" | "fuchsia" | "orange"
+  | "teal" | "slate" | "midnight";
 
 export const ACCENTS: { id: PrismAccent; label: string; swatch: string }[] = [
-  { id: "mint", label: "Mint", swatch: "oklch(0.78 0.15 150)" },
-  { id: "violet", label: "Violet", swatch: "oklch(0.74 0.16 295)" },
-  { id: "amber", label: "Amber", swatch: "oklch(0.82 0.14 80)" },
-  { id: "rose", label: "Rose", swatch: "oklch(0.72 0.18 15)" },
+  { id: "mint",     label: "Mint",     swatch: "oklch(0.78 0.15 150)" },
+  { id: "violet",   label: "Violet",   swatch: "oklch(0.74 0.16 295)" },
+  { id: "amber",    label: "Amber",    swatch: "oklch(0.82 0.14 80)" },
+  { id: "rose",     label: "Rose",     swatch: "oklch(0.72 0.18 15)" },
+  { id: "sky",      label: "Sky",      swatch: "oklch(0.78 0.13 230)" },
+  { id: "emerald",  label: "Emerald",  swatch: "oklch(0.72 0.17 160)" },
+  { id: "crimson",  label: "Crimson",  swatch: "oklch(0.62 0.22 25)" },
+  { id: "indigo",   label: "Indigo",   swatch: "oklch(0.62 0.18 270)" },
+  { id: "lime",     label: "Lime",     swatch: "oklch(0.86 0.18 130)" },
+  { id: "cyan",     label: "Cyan",     swatch: "oklch(0.82 0.13 200)" },
+  { id: "fuchsia",  label: "Fuchsia",  swatch: "oklch(0.72 0.22 330)" },
+  { id: "orange",   label: "Orange",   swatch: "oklch(0.74 0.18 50)" },
+  { id: "teal",     label: "Teal",     swatch: "oklch(0.72 0.13 190)" },
+  { id: "slate",    label: "Slate",    swatch: "oklch(0.68 0.03 250)" },
+  { id: "midnight", label: "Midnight", swatch: "oklch(0.55 0.14 260)" },
 ];
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
