@@ -76,9 +76,25 @@ export const BUILT_IN_BARE_PATH = "/api/public/bare/";
 /** Public wisp endpoint run by Mercury Workshop. Free, no key. */
 export const DEFAULT_WISP_URL = "wss://wisp.mercurywork.shop/";
 
+/**
+ * Origin that hosts the bare server when the page itself isn't served from
+ * Lovable (e.g. mirrored to jsDelivr, Pages, or embedded elsewhere). Override
+ * at build time with VITE_BARE_ORIGIN.
+ */
+const FALLBACK_BARE_ORIGIN =
+  (import.meta.env.VITE_BARE_ORIGIN as string | undefined) ||
+  "https://scramjet2.lovable.app";
+
 function defaultBareUrl(): string {
   if (typeof window === "undefined") return BUILT_IN_BARE_PATH;
-  return window.location.origin + BUILT_IN_BARE_PATH;
+  const host = window.location.hostname;
+  const sameOrigin =
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host.endsWith(".lovable.app") ||
+    host.endsWith(".lovable.dev");
+  const origin = sameOrigin ? window.location.origin : FALLBACK_BARE_ORIGIN;
+  return origin + BUILT_IN_BARE_PATH;
 }
 
 export const DEFAULT_SETTINGS: ProxySettings = {
