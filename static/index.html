@@ -1,48 +1,64 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!--
-      Base href so any relative URL on this page resolves against the
-      jsDelivr-mirrored repo. Update <user>/<repo>@<ref> if you fork.
-    -->
-    <base href="https://cdn.jsdelivr.net/gh/xunubis/scramjet2@main/" />
-    <title>Prism</title>
-    <meta name="description" content="Prism — web proxy. Launch the full app on Lovable." />
-    <link rel="icon" href="public/favicon.ico" />
-    <style>
-      :root { color-scheme: dark; }
-      html, body { margin: 0; height: 100%; background: #07070b; color: #e8e8f0;
-        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-      main { min-height: 100%; display: grid; place-items: center; padding: 2rem; }
-      .card { max-width: 32rem; text-align: center; }
-      h1 { font-size: clamp(2rem, 6vw, 3.25rem); margin: 0 0 .5rem; letter-spacing: -0.02em; }
-      p { opacity: .75; line-height: 1.55; margin: 0 0 1.5rem; }
-      a.btn { display: inline-block; padding: .85rem 1.4rem; border-radius: .75rem;
-        background: linear-gradient(135deg,#6366f1,#a855f7); color: #fff;
-        text-decoration: none; font-weight: 600; }
-      a.btn:hover { filter: brightness(1.1); }
-      small { display: block; margin-top: 1.25rem; opacity: .4; font-size: .8rem; }
-    </style>
-  </head>
-  <body>
-    <main>
-      <div class="card">
-        <h1>Prism</h1>
-        <p>
-          The full proxy needs to run from its own origin so the service worker
-          can register. This CDN page redirects you to the live app.
-        </p>
-        <a class="btn" href="https://scramjet2.lovable.app/">Launch Prism</a>
-        <small>Served via jsDelivr · backend: scramjet2.lovable.app</small>
-      </div>
-    </main>
-    <script>
-      // Auto-forward unless the visitor explicitly asked to stay (?stay=1)
-      if (!new URLSearchParams(location.search).has('stay')) {
-        setTimeout(() => { location.replace('https://scramjet2.lovable.app/'); }, 1200);
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<base href="https://cdn.jsdelivr.net/gh/xunubis/scramjet2@main/" />
+<title>Prism</title>
+<meta name="description" content="Prism — fast, private web proxy." />
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; padding: 0; height: 100%; background: #0a0a0f; color: #e7e7ee;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #app { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; }
+  #fallback { position: fixed; inset: 0; display: none; place-items: center; padding: 24px; }
+  #fallback.show { display: grid; }
+  .card { max-width: 460px; width: 100%; padding: 28px 28px 24px;
+    background: linear-gradient(180deg, #15151d, #0f0f16); border: 1px solid #232334;
+    border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,.5); text-align: center; }
+  h1 { margin: 0 0 8px; font-size: 22px; letter-spacing: -.01em; }
+  p { margin: 0 0 18px; color: #a5a5b8; font-size: 14px; line-height: 1.5; }
+  a.btn { display: inline-block; padding: 11px 18px; border-radius: 10px;
+    background: linear-gradient(135deg,#7c3aed,#4f46e5); color: #fff; text-decoration: none;
+    font-weight: 600; font-size: 14px; }
+  a.btn:hover { filter: brightness(1.1); }
+  .muted { margin-top: 14px; font-size: 12px; color: #6c6c80; }
+  .muted a { color: #9b9bb3; }
+</style>
+</head>
+<body>
+<iframe
+  id="app"
+  src="https://scramjet2.lovable.app/"
+  allow="clipboard-read; clipboard-write; fullscreen; autoplay; encrypted-media; picture-in-picture"
+  referrerpolicy="no-referrer"
+  title="Prism"
+></iframe>
+
+<div id="fallback" role="alert">
+  <div class="card">
+    <h1>Embed blocked</h1>
+    <p>This browser or network prevented Prism from loading inside an iframe. Open the full app in a new tab instead.</p>
+    <a class="btn" href="https://scramjet2.lovable.app/" target="_blank" rel="noopener">Open Prism →</a>
+    <div class="muted">Or visit <a href="https://scramjet2.lovable.app/">scramjet2.lovable.app</a> directly.</div>
+  </div>
+</div>
+
+<script>
+  // Fallback detection: if the iframe never reports a load within 6s, assume
+  // the parent site / CSP / X-Frame-Options blocked it and show the link card.
+  (function () {
+    var frame = document.getElementById('app');
+    var fb = document.getElementById('fallback');
+    var loaded = false;
+    frame.addEventListener('load', function () { loaded = true; });
+    setTimeout(function () {
+      if (!loaded) {
+        try { frame.style.display = 'none'; } catch (_) {}
+        fb.classList.add('show');
       }
-    </script>
-  </body>
+    }, 6000);
+  })();
+</script>
+</body>
 </html>
