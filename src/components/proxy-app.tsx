@@ -777,7 +777,7 @@ function BlankTab({ onPick }: { onPick: (url: string) => void }) {
     { label: "GitHub",   url: "github.com",   domain: "github.com" },
     { label: "Discord",  url: "discord.com",  domain: "discord.com" },
     { label: "YouTube",  url: "youtube.com",  domain: "youtube.com" },
-    { label: "Reanime",  url: "reanime.app",  domain: "reanime.app" },
+    { label: "Reanime",  url: "reanime.to",  domain: "reanime.to" },
   ];
   const placeholders = [
     "barber shop",
