@@ -66,7 +66,7 @@ function GamesPage() {
   const [files, setFiles] = useState<string[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [q, setQ] = useState("");
-  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
   useEffect(() => {
     let alive = true;
