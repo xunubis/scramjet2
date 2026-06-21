@@ -174,8 +174,8 @@ function GamesPage() {
               return (
                 <section
                   key={c}
-                  ref={(el) => {
-                    sectionRefs.current[c] = el;
+                  ref={(el: HTMLElement | null) => {
+                    sectionRefs.current[c] = el as HTMLDivElement | null;
                   }}
                   id={`section-${c}`}
                 >
