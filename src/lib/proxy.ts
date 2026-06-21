@@ -64,23 +64,39 @@ declare global {
 
 export const SETTINGS_KEY = "prism.settings.v2";
 
+export type PrismTheme =
+  | "default"
+  | "linux"
+  | "cartoon"
+  | "paper"
+  | "noir"
+  | "synthwave"
+  | "ocean";
+
+export const THEMES: { id: PrismTheme; label: string; hint: string }[] = [
+  { id: "default",   label: "Default",   hint: "Calm slate · mint" },
+  { id: "linux",     label: "Linux",     hint: "Terminal green on black" },
+  { id: "cartoon",   label: "Cartoon",   hint: "Bright pastel + bold" },
+  { id: "paper",     label: "Paper",     hint: "Cream + ink" },
+  { id: "noir",      label: "Noir",      hint: "Pure black & white" },
+  { id: "synthwave", label: "Synthwave", hint: "Purple · pink neon" },
+  { id: "ocean",     label: "Ocean",     hint: "Deep blue + teal" },
+];
+
 export interface ProxySettings {
   bareUrl: string;
   wispUrl: string;
   defaultEngine: ProxyEngine;
   reducedMotion: boolean;
   accent: PrismAccent;
+  theme: PrismTheme;
+  wallpaperUrl: string;
 }
 
 export const BUILT_IN_BARE_PATH = "/api/public/bare/";
 /** Public wisp endpoint run by Mercury Workshop. Free, no key. */
 export const DEFAULT_WISP_URL = "wss://wisp.mercurywork.shop/";
 
-/**
- * Origin that hosts the bare server when the page itself isn't served from
- * Lovable (e.g. mirrored to jsDelivr, Pages, or embedded elsewhere). Override
- * at build time with VITE_BARE_ORIGIN.
- */
 const FALLBACK_BARE_ORIGIN =
   (import.meta.env.VITE_BARE_ORIGIN as string | undefined) ||
   "https://scramjet2.lovable.app";
@@ -103,6 +119,8 @@ export const DEFAULT_SETTINGS: ProxySettings = {
   defaultEngine: "uv",
   reducedMotion: false,
   accent: "mint",
+  theme: "default",
+  wallpaperUrl: "",
 };
 
 export function loadSettings(): ProxySettings {
