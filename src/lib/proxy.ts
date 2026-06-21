@@ -364,3 +364,27 @@ export function otherEngine(e: ProxyEngine): ProxyEngine {
 export function engineLabel(e: ProxyEngine): string {
   return e === "uv" ? "Ultraviolet" : "Scramjet";
 }
+
+/**
+ * Warm a target URL through the service worker so a later click feels
+ * instant. Best-effort: silently ignores errors and dedupes per URL.
+ */
+const prefetched = new Set<string>();
+export function prefetchTarget(target: string, settings: ProxySettings) {
+  if (!target) return;
+  const url = normalizeTarget(target);
+  if (prefetched.has(url)) return;
+  prefetched.add(url);
+  // Kick UV's pipeline first — it's the default engine.
+  ensureUltravioletReady(settings.bareUrl)
+    .then(() => {
+      try {
+        const proxied = buildUvUrl(url);
+        // no-cors fetch warms the SW + bare cache without CORS errors.
+        void fetch(proxied, { mode: "no-cors", credentials: "omit" }).catch(() => {});
+      } catch {
+        /* ignore */
+      }
+    })
+    .catch(() => {});
+}
