@@ -28,10 +28,13 @@ import {
   loadSettings,
   normalizeTarget,
   otherEngine,
+  prefetchTarget,
   prewarmEngines,
+  type PrismTheme,
   type ProxyEngine,
   type ProxySettings,
   saveSettings,
+  THEMES,
   updateBareTransport,
 } from "@/lib/proxy";
 import {
