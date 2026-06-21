@@ -28,10 +28,13 @@ import {
   loadSettings,
   normalizeTarget,
   otherEngine,
+  prefetchTarget,
   prewarmEngines,
+  type PrismTheme,
   type ProxyEngine,
   type ProxySettings,
   saveSettings,
+  THEMES,
   updateBareTransport,
 } from "@/lib/proxy";
 import {
@@ -165,12 +168,13 @@ export function ProxyApp() {
     return () => window.removeEventListener("keydown", onKey);
   }, [panic]);
 
-  // Apply appearance settings (reduced motion + accent theme) to the document.
+  // Apply appearance settings (reduced motion + accent + theme) to the document.
   useEffect(() => {
     const root = document.documentElement;
     root.classList.toggle("prism-no-motion", settings.reducedMotion);
     root.dataset.accent = settings.accent;
-  }, [settings.reducedMotion, settings.accent]);
+    root.dataset.theme = settings.theme;
+  }, [settings.reducedMotion, settings.accent, settings.theme]);
 
   const activeTab = tabs.find((t) => t.id === activeId) ?? null;
 
@@ -306,19 +310,17 @@ export function ProxyApp() {
 
   return (
     <div className="relative flex h-screen flex-col overflow-hidden bg-background text-foreground">
-      <div className="absolute inset-0 prism-wallpaper" aria-hidden />
-      <div className="prism-stars" aria-hidden>
-        <span className="prism-falling" style={{ left: "8%",  animationDuration: "9s",  animationDelay: "0s" }} />
-        <span className="prism-falling" style={{ left: "22%", animationDuration: "13s", animationDelay: "2s" }} />
-        <span className="prism-falling" style={{ left: "37%", animationDuration: "11s", animationDelay: "4s" }} />
-        <span className="prism-falling" style={{ left: "52%", animationDuration: "14s", animationDelay: "1s" }} />
-        <span className="prism-falling" style={{ left: "66%", animationDuration: "10s", animationDelay: "6s" }} />
-        <span className="prism-falling" style={{ left: "78%", animationDuration: "12s", animationDelay: "3s" }} />
-        <span className="prism-falling" style={{ left: "91%", animationDuration: "15s", animationDelay: "5s" }} />
-        <span className="prism-shoot" style={{ top: "12%", animationDelay: "2s",  animationDuration: "8s" }} />
-        <span className="prism-shoot" style={{ top: "34%", animationDelay: "11s", animationDuration: "9s" }} />
-        <span className="prism-shoot" style={{ top: "58%", animationDelay: "20s", animationDuration: "10s" }} />
-      </div>
+      <div
+        className="absolute inset-0 prism-wallpaper"
+        data-custom={settings.wallpaperUrl ? "1" : undefined}
+        style={
+          settings.wallpaperUrl
+            ? ({ "--prism-wallpaper-image": `url("${settings.wallpaperUrl}")` } as React.CSSProperties)
+            : undefined
+        }
+        aria-hidden
+      />
+
 
       <div className="relative z-10 flex h-full flex-col pr-14">
         <TabStrip
@@ -745,6 +747,8 @@ function BookmarksBar({
           <button
             key={b.id}
             onClick={() => onPick(b.url)}
+            onMouseEnter={() => prefetchTarget(b.url, loadSettings())}
+            onFocus={() => prefetchTarget(b.url, loadSettings())}
             className="prism-smooth flex items-center gap-1.5 rounded-full px-2.5 py-1 text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
             title={b.url}
           >
@@ -854,7 +858,7 @@ function BlankTab({ onPick }: { onPick: (url: string) => void }) {
   }
 
   return (
-    <div className="relative flex h-full flex-col items-center justify-center px-6 text-center prism-wallpaper">
+    <div className="relative flex h-full flex-col items-center justify-center px-6 text-center">
       <div
         className={
           "prism-enter flex w-full max-w-3xl flex-col items-center " +
@@ -931,6 +935,8 @@ function BlankTab({ onPick }: { onPick: (url: string) => void }) {
             <button
               key={s.label}
               onClick={() => go(s.url)}
+              onMouseEnter={() => prefetchTarget(s.url, loadSettings())}
+              onFocus={() => prefetchTarget(s.url, loadSettings())}
               className="prism-smooth group flex w-20 flex-col items-center gap-2"
             >
               <span className="prism-smooth flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03] group-hover:-translate-y-0.5 group-hover:border-white/20 group-hover:bg-white/[0.06]">
@@ -1050,9 +1056,32 @@ function SettingsSheet({
 
           <div>
             <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Theme
+            </label>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              {THEMES.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setDraft({ ...draft, theme: t.id as PrismTheme })}
+                  className={
+                    "prism-smooth rounded-md border px-2.5 py-2 text-left text-xs " +
+                    (draft.theme === t.id
+                      ? "border-primary bg-primary/15 text-foreground"
+                      : "border-border/60 text-muted-foreground hover:bg-secondary")
+                  }
+                >
+                  <div className="text-[13px] font-medium text-foreground">{t.label}</div>
+                  <div className="mt-0.5 text-[10px] opacity-75">{t.hint}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Accent
             </label>
-            <div className="mt-2 flex gap-2.5">
+            <div className="mt-2 flex flex-wrap gap-2.5">
               {ACCENTS.map((a) => (
                 <button
                   key={a.id}
@@ -1069,6 +1098,22 @@ function SettingsSheet({
                 />
               ))}
             </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Custom wallpaper
+            </label>
+            <input
+              value={draft.wallpaperUrl}
+              onChange={(e) => setDraft({ ...draft, wallpaperUrl: e.target.value })}
+              placeholder="https://example.com/image.jpg  (leave empty for default)"
+              className="mt-2 w-full rounded-md border border-border/60 bg-background/60 px-3 py-2 text-sm outline-none focus:border-primary/60"
+              spellCheck={false}
+            />
+            <p className="mt-2 text-xs text-muted-foreground">
+              Paste any image URL. Applied behind the new-tab page and tab area.
+            </p>
           </div>
 
           {/* Cloaking */}

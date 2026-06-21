@@ -156,12 +156,24 @@
 /* --- Truffled-style backdrop -------------------------------------------- */
 
 .prism-wallpaper {
-  background-color: oklch(0.14 0.012 220);
+  background-color: oklch(0.16 0.012 240);
   background-image:
-    linear-gradient(to right,  oklch(1 0 0 / 0.035) 1px, transparent 1px),
-    linear-gradient(to bottom, oklch(1 0 0 / 0.035) 1px, transparent 1px),
-    radial-gradient(ellipse at 50% 30%, oklch(0.22 0.04 200 / 0.55), transparent 60%);
-  background-size: 44px 44px, 44px 44px, 100% 100%;
+    linear-gradient(to right,  oklch(1 0 0 / 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(1 0 0 / 0.025) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 0%, oklch(0.26 0.04 220 / 0.5), transparent 65%);
+  background-size: 56px 56px, 56px 56px, 100% 100%;
+}
+
+/* When a custom wallpaper image is set, layer it under the grid + vignette. */
+.prism-wallpaper[data-custom="1"] {
+  background-image:
+    linear-gradient(to right,  oklch(1 0 0 / 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(1 0 0 / 0.02) 1px, transparent 1px),
+    linear-gradient(180deg, oklch(0 0 0 / 0.55), oklch(0 0 0 / 0.35)),
+    var(--prism-wallpaper-image, none);
+  background-size: 56px 56px, 56px 56px, 100% 100%, cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 /* --- Night sky: falling + shooting stars --------------------------------- */
@@ -339,4 +351,167 @@ html[data-accent="midnight"] { --primary: oklch(0.55 0.14 260); --accent: oklch(
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+/* --- Theme presets (Settings → Theme) ------------------------------------ */
+
+html[data-theme="linux"] {
+  --background: oklch(0.12 0.005 150);
+  --foreground: oklch(0.92 0.16 145);
+  --card: oklch(0.16 0.01 150);
+  --card-foreground: oklch(0.92 0.16 145);
+  --popover: oklch(0.14 0.01 150);
+  --popover-foreground: oklch(0.92 0.16 145);
+  --primary: oklch(0.85 0.2 140);
+  --primary-foreground: oklch(0.1 0.01 150);
+  --secondary: oklch(0.2 0.01 150);
+  --secondary-foreground: oklch(0.92 0.16 145);
+  --muted: oklch(0.2 0.01 150);
+  --muted-foreground: oklch(0.7 0.1 145);
+  --accent: oklch(0.85 0.2 140);
+  --accent-foreground: oklch(0.1 0.01 150);
+  --border: oklch(0.3 0.05 145);
+  --input: oklch(0.2 0.01 150);
+  --ring: oklch(0.85 0.2 140);
+  --font-display: var(--font-mono);
+}
+html[data-theme="linux"] .prism-wallpaper {
+  background-color: oklch(0.1 0.005 150);
+  background-image:
+    linear-gradient(to right,  oklch(0.85 0.2 140 / 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(0.85 0.2 140 / 0.06) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 0%, oklch(0.25 0.1 145 / 0.4), transparent 70%);
+}
+
+html[data-theme="cartoon"] {
+  --background: oklch(0.97 0.04 90);
+  --foreground: oklch(0.2 0.04 280);
+  --card: oklch(1 0.02 90);
+  --card-foreground: oklch(0.2 0.04 280);
+  --popover: oklch(1 0.02 90);
+  --popover-foreground: oklch(0.2 0.04 280);
+  --primary: oklch(0.7 0.22 25);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.92 0.08 200);
+  --secondary-foreground: oklch(0.2 0.04 280);
+  --muted: oklch(0.94 0.04 90);
+  --muted-foreground: oklch(0.45 0.06 280);
+  --accent: oklch(0.78 0.2 50);
+  --accent-foreground: oklch(0.2 0.04 280);
+  --border: oklch(0.2 0.04 280);
+  --input: oklch(0.94 0.04 90);
+  --ring: oklch(0.7 0.22 25);
+  --radius: 1rem;
+}
+html[data-theme="cartoon"] .prism-wallpaper {
+  background-color: oklch(0.95 0.06 90);
+  background-image:
+    radial-gradient(circle at 15% 20%, oklch(0.85 0.2 25 / 0.35), transparent 30%),
+    radial-gradient(circle at 85% 70%, oklch(0.85 0.2 230 / 0.35), transparent 30%),
+    radial-gradient(circle at 50% 50%, oklch(0.85 0.2 130 / 0.25), transparent 40%);
+}
+
+html[data-theme="paper"] {
+  --background: oklch(0.96 0.015 80);
+  --foreground: oklch(0.18 0.01 80);
+  --card: oklch(0.99 0.01 80);
+  --card-foreground: oklch(0.18 0.01 80);
+  --popover: oklch(0.99 0.01 80);
+  --popover-foreground: oklch(0.18 0.01 80);
+  --primary: oklch(0.2 0.01 80);
+  --primary-foreground: oklch(0.96 0.015 80);
+  --secondary: oklch(0.9 0.02 80);
+  --secondary-foreground: oklch(0.18 0.01 80);
+  --muted: oklch(0.92 0.02 80);
+  --muted-foreground: oklch(0.45 0.01 80);
+  --accent: oklch(0.55 0.18 30);
+  --accent-foreground: oklch(0.99 0 0);
+  --border: oklch(0.85 0.02 80);
+  --input: oklch(0.93 0.02 80);
+  --ring: oklch(0.55 0.18 30);
+}
+html[data-theme="paper"] .prism-wallpaper {
+  background-color: oklch(0.94 0.02 80);
+  background-image:
+    linear-gradient(to right,  oklch(0 0 0 / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(0 0 0 / 0.04) 1px, transparent 1px);
+}
+
+html[data-theme="noir"] {
+  --background: oklch(0.06 0 0);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.1 0 0);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.08 0 0);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.98 0 0);
+  --primary-foreground: oklch(0.06 0 0);
+  --secondary: oklch(0.14 0 0);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.14 0 0);
+  --muted-foreground: oklch(0.65 0 0);
+  --accent: oklch(0.98 0 0);
+  --accent-foreground: oklch(0.06 0 0);
+  --border: oklch(0.2 0 0);
+  --input: oklch(0.14 0 0);
+  --ring: oklch(0.98 0 0);
+}
+html[data-theme="noir"] .prism-wallpaper {
+  background-color: oklch(0.04 0 0);
+  background-image:
+    linear-gradient(to right,  oklch(1 0 0 / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(1 0 0 / 0.04) 1px, transparent 1px);
+}
+
+html[data-theme="synthwave"] {
+  --background: oklch(0.14 0.06 295);
+  --foreground: oklch(0.97 0.02 320);
+  --card: oklch(0.18 0.08 295);
+  --card-foreground: oklch(0.97 0.02 320);
+  --popover: oklch(0.18 0.08 295);
+  --popover-foreground: oklch(0.97 0.02 320);
+  --primary: oklch(0.75 0.25 330);
+  --primary-foreground: oklch(0.12 0.06 295);
+  --secondary: oklch(0.22 0.1 280);
+  --secondary-foreground: oklch(0.97 0.02 320);
+  --muted: oklch(0.22 0.08 280);
+  --muted-foreground: oklch(0.75 0.1 310);
+  --accent: oklch(0.78 0.2 200);
+  --accent-foreground: oklch(0.12 0.06 295);
+  --border: oklch(0.35 0.15 320);
+  --input: oklch(0.22 0.08 280);
+  --ring: oklch(0.75 0.25 330);
+}
+html[data-theme="synthwave"] .prism-wallpaper {
+  background-color: oklch(0.1 0.08 290);
+  background-image:
+    linear-gradient(to right,  oklch(0.78 0.2 330 / 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(0.78 0.2 200 / 0.12) 1px, transparent 1px),
+    linear-gradient(180deg, oklch(0.18 0.1 290) 0%, oklch(0.08 0.08 320) 100%);
+}
+
+html[data-theme="ocean"] {
+  --background: oklch(0.16 0.04 230);
+  --foreground: oklch(0.96 0.01 220);
+  --card: oklch(0.2 0.05 230);
+  --card-foreground: oklch(0.96 0.01 220);
+  --popover: oklch(0.18 0.05 230);
+  --popover-foreground: oklch(0.96 0.01 220);
+  --primary: oklch(0.78 0.13 200);
+  --primary-foreground: oklch(0.14 0.04 230);
+  --secondary: oklch(0.24 0.05 230);
+  --secondary-foreground: oklch(0.96 0.01 220);
+  --muted: oklch(0.24 0.05 230);
+  --muted-foreground: oklch(0.72 0.04 220);
+  --accent: oklch(0.78 0.13 200);
+  --accent-foreground: oklch(0.14 0.04 230);
+  --border: oklch(0.3 0.05 230);
+  --input: oklch(0.24 0.05 230);
+  --ring: oklch(0.78 0.13 200);
+}
+html[data-theme="ocean"] .prism-wallpaper {
+  background-color: oklch(0.12 0.05 230);
+  background-image:
+    radial-gradient(ellipse at 30% 0%, oklch(0.4 0.1 220 / 0.6), transparent 60%),
+    radial-gradient(ellipse at 70% 100%, oklch(0.4 0.12 180 / 0.5), transparent 60%);
 }
