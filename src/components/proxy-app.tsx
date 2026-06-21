@@ -933,6 +933,8 @@ function BlankTab({ onPick }: { onPick: (url: string) => void }) {
             <button
               key={s.label}
               onClick={() => go(s.url)}
+              onMouseEnter={() => prefetchTarget(s.url, loadSettings())}
+              onFocus={() => prefetchTarget(s.url, loadSettings())}
               className="prism-smooth group flex w-20 flex-col items-center gap-2"
             >
               <span className="prism-smooth flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03] group-hover:-translate-y-0.5 group-hover:border-white/20 group-hover:bg-white/[0.06]">
