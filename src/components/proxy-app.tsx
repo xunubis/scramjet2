@@ -858,7 +858,7 @@ function BlankTab({ onPick }: { onPick: (url: string) => void }) {
   }
 
   return (
-    <div className="relative flex h-full flex-col items-center justify-center px-6 text-center prism-wallpaper">
+    <div className="relative flex h-full flex-col items-center justify-center px-6 text-center">
       <div
         className={
           "prism-enter flex w-full max-w-3xl flex-col items-center " +
