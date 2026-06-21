@@ -168,12 +168,13 @@ export function ProxyApp() {
     return () => window.removeEventListener("keydown", onKey);
   }, [panic]);
 
-  // Apply appearance settings (reduced motion + accent theme) to the document.
+  // Apply appearance settings (reduced motion + accent + theme) to the document.
   useEffect(() => {
     const root = document.documentElement;
     root.classList.toggle("prism-no-motion", settings.reducedMotion);
     root.dataset.accent = settings.accent;
-  }, [settings.reducedMotion, settings.accent]);
+    root.dataset.theme = settings.theme;
+  }, [settings.reducedMotion, settings.accent, settings.theme]);
 
   const activeTab = tabs.find((t) => t.id === activeId) ?? null;
 
