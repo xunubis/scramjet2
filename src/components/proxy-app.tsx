@@ -1056,9 +1056,32 @@ function SettingsSheet({
 
           <div>
             <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Theme
+            </label>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              {THEMES.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setDraft({ ...draft, theme: t.id as PrismTheme })}
+                  className={
+                    "prism-smooth rounded-md border px-2.5 py-2 text-left text-xs " +
+                    (draft.theme === t.id
+                      ? "border-primary bg-primary/15 text-foreground"
+                      : "border-border/60 text-muted-foreground hover:bg-secondary")
+                  }
+                >
+                  <div className="text-[13px] font-medium text-foreground">{t.label}</div>
+                  <div className="mt-0.5 text-[10px] opacity-75">{t.hint}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Accent
             </label>
-            <div className="mt-2 flex gap-2.5">
+            <div className="mt-2 flex flex-wrap gap-2.5">
               {ACCENTS.map((a) => (
                 <button
                   key={a.id}
@@ -1075,6 +1098,22 @@ function SettingsSheet({
                 />
               ))}
             </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Custom wallpaper
+            </label>
+            <input
+              value={draft.wallpaperUrl}
+              onChange={(e) => setDraft({ ...draft, wallpaperUrl: e.target.value })}
+              placeholder="https://example.com/image.jpg  (leave empty for default)"
+              className="mt-2 w-full rounded-md border border-border/60 bg-background/60 px-3 py-2 text-sm outline-none focus:border-primary/60"
+              spellCheck={false}
+            />
+            <p className="mt-2 text-xs text-muted-foreground">
+              Paste any image URL. Applied behind the new-tab page and tab area.
+            </p>
           </div>
 
           {/* Cloaking */}
