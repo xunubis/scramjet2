@@ -1021,19 +1021,6 @@ function SettingsSheet({
         </div>
 
         <div className="mt-6 space-y-5">
-          <Field
-            label="Bare server URL (Ultraviolet)"
-            value={draft.bareUrl}
-            onChange={(v) => setDraft({ ...draft, bareUrl: v })}
-            help="Defaults to the built-in /api/public/bare/ on this domain."
-          />
-          <Field
-            label="Wisp URL (Scramjet)"
-            value={draft.wispUrl}
-            onChange={(v) => setDraft({ ...draft, wispUrl: v })}
-            help="Defaults to wss://wisp.mercurywork.shop/ — free public endpoint."
-          />
-
           <div>
             <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Default engine
@@ -1056,6 +1043,54 @@ function SettingsSheet({
                 </button>
               ))}
             </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Performance mode
+            </label>
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {PERFORMANCE_MODES.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => setDraft({ ...draft, performanceMode: p.id as PerformanceMode })}
+                  className={
+                    "prism-smooth rounded-md border px-2.5 py-2 text-left text-xs " +
+                    (draft.performanceMode === p.id
+                      ? "border-primary bg-primary/15 text-foreground"
+                      : "border-border/60 text-muted-foreground hover:bg-secondary")
+                  }
+                >
+                  <div className="text-[13px] font-medium text-foreground">{p.label}</div>
+                  <div className="mt-0.5 text-[10px] opacity-75">{p.hint}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Search engine
+            </label>
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {SEARCH_ENGINES.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setDraft({ ...draft, searchEngine: s.id as SearchEngine })}
+                  className={
+                    "prism-smooth rounded-md border px-2.5 py-2 text-center text-xs " +
+                    (draft.searchEngine === s.id
+                      ? "border-primary bg-primary/15 text-foreground"
+                      : "border-border/60 text-muted-foreground hover:bg-secondary")
+                  }
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Privacy-respecting engines only. Used when you type a query instead of a URL.
+            </p>
           </div>
 
           <div>
