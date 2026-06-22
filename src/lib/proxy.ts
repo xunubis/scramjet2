@@ -335,13 +335,17 @@ export async function createScramjetFrame(iframeEl: HTMLIFrameElement, wispUrl: 
 
 /** Warm engines on boot, depending on performance mode. */
 export function prewarmEngines(s: ProxySettings) {
-  if (s.performanceMode !== "boot") return;
+  if (s.performanceMode === "ondemand") return;
+  // Always warm UV — it's the default engine and the SW+bare setup is the
+  // single biggest first-click delay. Cheap to do at boot.
   void ensureUltravioletReady(s.bareUrl).catch((e) =>
     console.warn("[prism] UV prewarm failed:", e),
   );
-  void ensureScramjetReady(s.wispUrl).catch((e) =>
-    console.warn("[prism] Scramjet prewarm failed:", e),
-  );
+  if (s.performanceMode === "boot") {
+    void ensureScramjetReady(s.wispUrl).catch((e) =>
+      console.warn("[prism] Scramjet prewarm failed:", e),
+    );
+  }
 }
 
 /**
