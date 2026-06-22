@@ -141,6 +141,8 @@ export const DEFAULT_SETTINGS: ProxySettings = {
   accent: "mint",
   theme: "default",
   wallpaperUrl: "",
+  performanceMode: "hover",
+  searchEngine: "duckduckgo",
 };
 
 export function loadSettings(): ProxySettings {
