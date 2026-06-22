@@ -15,7 +15,7 @@ import {
   Trash2,
   Star,
   EyeOff,
-  ExternalLink,
+  
 } from "lucide-react";
 import {
   ACCENTS,
