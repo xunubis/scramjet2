@@ -15,7 +15,7 @@ import {
   Trash2,
   Star,
   EyeOff,
-  ExternalLink,
+  
 } from "lucide-react";
 import {
   ACCENTS,
@@ -28,12 +28,16 @@ import {
   loadSettings,
   normalizeTarget,
   otherEngine,
+  PERFORMANCE_MODES,
   prefetchTarget,
   prewarmEngines,
+  type PerformanceMode,
   type PrismTheme,
   type ProxyEngine,
   type ProxySettings,
   saveSettings,
+  SEARCH_ENGINES,
+  type SearchEngine,
   THEMES,
   updateBareTransport,
 } from "@/lib/proxy";
@@ -52,7 +56,6 @@ import {
   loadCloak,
   loadPanic,
   openAboutBlank,
-  openBlob,
   saveBehavior,
   saveBookmarks,
   saveCloak,
@@ -187,7 +190,7 @@ export function ProxyApp() {
     if (!address) return;
     const tab = tabs.find((t) => t.id === id);
     if (!tab) return;
-    const target = normalizeTarget(address);
+    const target = normalizeTarget(address, settings.searchEngine);
     try {
       updateTab(id, { loading: true, errored: false, errorMsg: undefined, address });
       if (tab.engine === "uv") {
@@ -1017,19 +1020,6 @@ function SettingsSheet({
         </div>
 
         <div className="mt-6 space-y-5">
-          <Field
-            label="Bare server URL (Ultraviolet)"
-            value={draft.bareUrl}
-            onChange={(v) => setDraft({ ...draft, bareUrl: v })}
-            help="Defaults to the built-in /api/public/bare/ on this domain."
-          />
-          <Field
-            label="Wisp URL (Scramjet)"
-            value={draft.wispUrl}
-            onChange={(v) => setDraft({ ...draft, wispUrl: v })}
-            help="Defaults to wss://wisp.mercurywork.shop/ — free public endpoint."
-          />
-
           <div>
             <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Default engine
@@ -1052,6 +1042,54 @@ function SettingsSheet({
                 </button>
               ))}
             </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Performance mode
+            </label>
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {PERFORMANCE_MODES.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => setDraft({ ...draft, performanceMode: p.id as PerformanceMode })}
+                  className={
+                    "prism-smooth rounded-md border px-2.5 py-2 text-left text-xs " +
+                    (draft.performanceMode === p.id
+                      ? "border-primary bg-primary/15 text-foreground"
+                      : "border-border/60 text-muted-foreground hover:bg-secondary")
+                  }
+                >
+                  <div className="text-[13px] font-medium text-foreground">{p.label}</div>
+                  <div className="mt-0.5 text-[10px] opacity-75">{p.hint}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Search engine
+            </label>
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {SEARCH_ENGINES.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setDraft({ ...draft, searchEngine: s.id as SearchEngine })}
+                  className={
+                    "prism-smooth rounded-md border px-2.5 py-2 text-center text-xs " +
+                    (draft.searchEngine === s.id
+                      ? "border-primary bg-primary/15 text-foreground"
+                      : "border-border/60 text-muted-foreground hover:bg-secondary")
+                  }
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Privacy-respecting engines only. Used when you type a query instead of a URL.
+            </p>
           </div>
 
           <div>
@@ -1244,22 +1282,6 @@ function SettingsSheet({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => openAboutBlank()}
-              className="prism-smooth flex items-center justify-center gap-2 rounded-md border border-border/60 px-3 py-2 text-xs text-muted-foreground hover:bg-secondary"
-            >
-              <ExternalLink className="h-3.5 w-3.5" />
-              about:blank
-            </button>
-            <button
-              onClick={() => openBlob()}
-              className="prism-smooth flex items-center justify-center gap-2 rounded-md border border-border/60 px-3 py-2 text-xs text-muted-foreground hover:bg-secondary"
-            >
-              <ExternalLink className="h-3.5 w-3.5" />
-              blob: launcher
-            </button>
-          </div>
 
           <div className="flex items-center justify-between rounded-md border border-border/60 px-3 py-2.5">
             <div>
@@ -1318,34 +1340,6 @@ function SettingsSheet({
           </button>
         </div>
       </div>
-    </div>
-  );
-}
-
-function Field({
-  label,
-  value,
-  onChange,
-  help,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  help: string;
-}) {
-  return (
-    <div>
-      <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        {label}
-      </label>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="mt-2 w-full rounded-md border border-border/60 bg-background/60 px-3 py-2 text-sm outline-none focus:border-primary/60"
-        style={{ fontFamily: "var(--font-mono)" }}
-        spellCheck={false}
-      />
-      <p className="mt-2 text-xs text-muted-foreground">{help}</p>
     </div>
   );
 }

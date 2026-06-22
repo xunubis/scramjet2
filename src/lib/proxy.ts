@@ -83,6 +83,24 @@ export const THEMES: { id: PrismTheme; label: string; hint: string }[] = [
   { id: "ocean",     label: "Ocean",     hint: "Deep blue + teal" },
 ];
 
+export type PerformanceMode = "boot" | "hover" | "ondemand";
+
+export const PERFORMANCE_MODES: { id: PerformanceMode; label: string; hint: string }[] = [
+  { id: "boot",     label: "Eager",    hint: "Warm both engines on startup. Fastest clicks." },
+  { id: "hover",    label: "Balanced", hint: "Prefetch on hover/focus only." },
+  { id: "ondemand", label: "Light",    hint: "No prewarm. Lowest memory + bandwidth." },
+];
+
+export type SearchEngine = "duckduckgo" | "brave" | "startpage" | "ecosia" | "qwant";
+
+export const SEARCH_ENGINES: { id: SearchEngine; label: string; url: (q: string) => string }[] = [
+  { id: "duckduckgo", label: "DuckDuckGo", url: (q) => `https://duckduckgo.com/?q=${encodeURIComponent(q)}` },
+  { id: "brave",      label: "Brave",      url: (q) => `https://search.brave.com/search?q=${encodeURIComponent(q)}` },
+  { id: "startpage",  label: "Startpage",  url: (q) => `https://www.startpage.com/do/search?q=${encodeURIComponent(q)}` },
+  { id: "ecosia",     label: "Ecosia",     url: (q) => `https://www.ecosia.org/search?q=${encodeURIComponent(q)}` },
+  { id: "qwant",      label: "Qwant",      url: (q) => `https://www.qwant.com/?q=${encodeURIComponent(q)}` },
+];
+
 export interface ProxySettings {
   bareUrl: string;
   wispUrl: string;
@@ -91,6 +109,8 @@ export interface ProxySettings {
   accent: PrismAccent;
   theme: PrismTheme;
   wallpaperUrl: string;
+  performanceMode: PerformanceMode;
+  searchEngine: SearchEngine;
 }
 
 export const BUILT_IN_BARE_PATH = "/api/public/bare/";
@@ -121,6 +141,8 @@ export const DEFAULT_SETTINGS: ProxySettings = {
   accent: "mint",
   theme: "default",
   wallpaperUrl: "",
+  performanceMode: "hover",
+  searchEngine: "duckduckgo",
 };
 
 export function loadSettings(): ProxySettings {
@@ -310,8 +332,9 @@ export async function createScramjetFrame(iframeEl: HTMLIFrameElement, wispUrl: 
   return controller.createFrame(iframeEl, { plugins: [] });
 }
 
-/** Warm BOTH engines in the background so first navigation feels instant. */
+/** Warm engines on boot, depending on performance mode. */
 export function prewarmEngines(s: ProxySettings) {
+  if (s.performanceMode !== "boot") return;
   void ensureUltravioletReady(s.bareUrl).catch((e) =>
     console.warn("[prism] UV prewarm failed:", e),
   );
@@ -349,12 +372,13 @@ export async function clearProxyState(): Promise<void> {
 
 /* -------------------------------------------------------------------------- */
 
-export function normalizeTarget(target: string): string {
+export function normalizeTarget(target: string, engine: SearchEngine = "duckduckgo"): string {
   const t = target.trim();
   if (!t) return t;
   if (/^https?:\/\//i.test(t)) return t;
   if (/\.[a-z]{2,}/i.test(t)) return `https://${t}`;
-  return `https://duckduckgo.com/?q=${encodeURIComponent(t)}`;
+  const se = SEARCH_ENGINES.find((s) => s.id === engine) ?? SEARCH_ENGINES[0];
+  return se.url(t);
 }
 
 export function otherEngine(e: ProxyEngine): ProxyEngine {
@@ -366,21 +390,19 @@ export function engineLabel(e: ProxyEngine): string {
 }
 
 /**
- * Warm a target URL through the service worker so a later click feels
- * instant. Best-effort: silently ignores errors and dedupes per URL.
+ * Warm a target URL through the service worker. Noop if perf mode is "ondemand".
  */
 const prefetched = new Set<string>();
 export function prefetchTarget(target: string, settings: ProxySettings) {
   if (!target) return;
-  const url = normalizeTarget(target);
+  if (settings.performanceMode === "ondemand") return;
+  const url = normalizeTarget(target, settings.searchEngine);
   if (prefetched.has(url)) return;
   prefetched.add(url);
-  // Kick UV's pipeline first — it's the default engine.
   ensureUltravioletReady(settings.bareUrl)
     .then(() => {
       try {
         const proxied = buildUvUrl(url);
-        // no-cors fetch warms the SW + bare cache without CORS errors.
         void fetch(proxied, { mode: "no-cors", credentials: "omit" }).catch(() => {});
       } catch {
         /* ignore */
