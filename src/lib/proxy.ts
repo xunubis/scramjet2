@@ -83,6 +83,24 @@ export const THEMES: { id: PrismTheme; label: string; hint: string }[] = [
   { id: "ocean",     label: "Ocean",     hint: "Deep blue + teal" },
 ];
 
+export type PerformanceMode = "boot" | "hover" | "ondemand";
+
+export const PERFORMANCE_MODES: { id: PerformanceMode; label: string; hint: string }[] = [
+  { id: "boot",     label: "Eager",    hint: "Warm both engines on startup. Fastest clicks." },
+  { id: "hover",    label: "Balanced", hint: "Prefetch on hover/focus only." },
+  { id: "ondemand", label: "Light",    hint: "No prewarm. Lowest memory + bandwidth." },
+];
+
+export type SearchEngine = "duckduckgo" | "brave" | "startpage" | "ecosia" | "qwant";
+
+export const SEARCH_ENGINES: { id: SearchEngine; label: string; url: (q: string) => string }[] = [
+  { id: "duckduckgo", label: "DuckDuckGo", url: (q) => `https://duckduckgo.com/?q=${encodeURIComponent(q)}` },
+  { id: "brave",      label: "Brave",      url: (q) => `https://search.brave.com/search?q=${encodeURIComponent(q)}` },
+  { id: "startpage",  label: "Startpage",  url: (q) => `https://www.startpage.com/do/search?q=${encodeURIComponent(q)}` },
+  { id: "ecosia",     label: "Ecosia",     url: (q) => `https://www.ecosia.org/search?q=${encodeURIComponent(q)}` },
+  { id: "qwant",      label: "Qwant",      url: (q) => `https://www.qwant.com/?q=${encodeURIComponent(q)}` },
+];
+
 export interface ProxySettings {
   bareUrl: string;
   wispUrl: string;
@@ -91,6 +109,8 @@ export interface ProxySettings {
   accent: PrismAccent;
   theme: PrismTheme;
   wallpaperUrl: string;
+  performanceMode: PerformanceMode;
+  searchEngine: SearchEngine;
 }
 
 export const BUILT_IN_BARE_PATH = "/api/public/bare/";
