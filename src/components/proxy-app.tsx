@@ -56,7 +56,6 @@ import {
   loadCloak,
   loadPanic,
   openAboutBlank,
-  openAboutBlank,
   saveBehavior,
   saveBookmarks,
   saveCloak,
