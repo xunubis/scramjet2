@@ -91,10 +91,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/07cc5c13-76a0-446a-afd3-26c2bb789fa7/id-preview-20ddacf0--7fb6758e-f72c-4909-995f-d4668dea8ce6.lovable.app-1781467953618.png" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
+      // Preload proxy runtime so the first navigation is instant.
+      { rel: "preload", as: "script", href: "/uv/uv.bundle.js" },
+      { rel: "preload", as: "script", href: "/baremux/index.js" },
+      { rel: "preload", as: "script", href: "/uv/uv.config.js" },
     ],
   }),
   shellComponent: RootShell,

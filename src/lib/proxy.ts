@@ -229,16 +229,17 @@ export function ensureUltravioletReady(bareUrl: string): Promise<void> {
   if (uvPromise) return uvPromise;
   uvPromise = (async () => {
     if (!bareUrl) throw new Error("No bare server configured.");
-    // SW first — UV's bundle expects a controller to be live when it fetches.
-    await ensureServiceWorker();
-    await loadScript("/baremux/index.js");
-    await loadScript("/uv/uv.bundle.js");
-    await loadScript("/uv/uv.config.js");
+    // Kick off SW + scripts in parallel — scripts don't need the SW to load,
+    // only bare transport setup does. baremux/uv bundles are independent.
+    const swP = ensureServiceWorker();
+    await Promise.all([
+      loadScript("/baremux/index.js"),
+      loadScript("/uv/uv.bundle.js"),
+      loadScript("/uv/uv.config.js"),
+    ]);
+    await swP;
     const conn = (window.__prismBareConn ??=
       new window.BareMux.BareMuxConnection("/baremux/worker.js"));
-    // Use bare-v3 against our embedded /api/public/bare/ Worker endpoint.
-    // Epoxy/wisp was the source of intermittent "headers is not iterable"
-    // failures — bare-v3 over our own origin is the reliable path.
     await conn.setTransport("/baremod/index.mjs", [bareUrl]);
     console.info("[prism] UV ready — transport: bare-v3 ->", bareUrl);
   })().catch((err) => {
@@ -334,13 +335,17 @@ export async function createScramjetFrame(iframeEl: HTMLIFrameElement, wispUrl: 
 
 /** Warm engines on boot, depending on performance mode. */
 export function prewarmEngines(s: ProxySettings) {
-  if (s.performanceMode !== "boot") return;
+  if (s.performanceMode === "ondemand") return;
+  // Always warm UV — it's the default engine and the SW+bare setup is the
+  // single biggest first-click delay. Cheap to do at boot.
   void ensureUltravioletReady(s.bareUrl).catch((e) =>
     console.warn("[prism] UV prewarm failed:", e),
   );
-  void ensureScramjetReady(s.wispUrl).catch((e) =>
-    console.warn("[prism] Scramjet prewarm failed:", e),
-  );
+  if (s.performanceMode === "boot") {
+    void ensureScramjetReady(s.wispUrl).catch((e) =>
+      console.warn("[prism] Scramjet prewarm failed:", e),
+    );
+  }
 }
 
 /**
