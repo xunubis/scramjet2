@@ -1343,31 +1343,3 @@ function SettingsSheet({
     </div>
   );
 }
-
-function Field({
-  label,
-  value,
-  onChange,
-  help,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  help: string;
-}) {
-  return (
-    <div>
-      <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        {label}
-      </label>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="mt-2 w-full rounded-md border border-border/60 bg-background/60 px-3 py-2 text-sm outline-none focus:border-primary/60"
-        style={{ fontFamily: "var(--font-mono)" }}
-        spellCheck={false}
-      />
-      <p className="mt-2 text-xs text-muted-foreground">{help}</p>
-    </div>
-  );
-}
