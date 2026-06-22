@@ -1283,22 +1283,6 @@ function SettingsSheet({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => openAboutBlank()}
-              className="prism-smooth flex items-center justify-center gap-2 rounded-md border border-border/60 px-3 py-2 text-xs text-muted-foreground hover:bg-secondary"
-            >
-              <ExternalLink className="h-3.5 w-3.5" />
-              about:blank
-            </button>
-            <button
-              onClick={() => openBlob()}
-              className="prism-smooth flex items-center justify-center gap-2 rounded-md border border-border/60 px-3 py-2 text-xs text-muted-foreground hover:bg-secondary"
-            >
-              <ExternalLink className="h-3.5 w-3.5" />
-              blob: launcher
-            </button>
-          </div>
 
           <div className="flex items-center justify-between rounded-md border border-border/60 px-3 py-2.5">
             <div>
