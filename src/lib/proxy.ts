@@ -332,8 +332,9 @@ export async function createScramjetFrame(iframeEl: HTMLIFrameElement, wispUrl: 
   return controller.createFrame(iframeEl, { plugins: [] });
 }
 
-/** Warm BOTH engines in the background so first navigation feels instant. */
+/** Warm engines on boot, depending on performance mode. */
 export function prewarmEngines(s: ProxySettings) {
+  if (s.performanceMode !== "boot") return;
   void ensureUltravioletReady(s.bareUrl).catch((e) =>
     console.warn("[prism] UV prewarm failed:", e),
   );
