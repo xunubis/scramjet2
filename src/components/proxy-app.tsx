@@ -187,7 +187,7 @@ export function ProxyApp() {
     if (!address) return;
     const tab = tabs.find((t) => t.id === id);
     if (!tab) return;
-    const target = normalizeTarget(address);
+    const target = normalizeTarget(address, settings.searchEngine);
     try {
       updateTab(id, { loading: true, errored: false, errorMsg: undefined, address });
       if (tab.engine === "uv") {
