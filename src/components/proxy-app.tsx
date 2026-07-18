@@ -727,14 +727,51 @@ function SideRail({
 }
 
 function FooterLinks() {
+  const [now, setNow] = useState(() => new Date());
+  const [users] = useState(() => 30 + Math.floor(Math.random() * 40));
+  useEffect(() => {
+    const t = window.setInterval(() => setNow(new Date()), 1000 * 15);
+    return () => window.clearInterval(t);
+  }, []);
+  const time = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-3 z-10 flex items-center justify-center gap-6 text-xs text-muted-foreground/60">
-      <a href="#" className="pointer-events-auto prism-smooth hover:text-foreground">credits</a>
-      <span className="text-muted-foreground/30">/</span>
-      <a href="#" className="pointer-events-auto prism-smooth hover:text-foreground">dmca</a>
-    </div>
+    <>
+      {/* Online users — top left */}
+      <div className="pointer-events-none absolute left-3 top-2 z-10 flex items-center gap-1.5 text-[11px] text-primary/90">
+        <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
+        online users: {users}
+      </div>
+      {/* Mascot — bottom left */}
+      <div className="pointer-events-none absolute bottom-2 left-3 z-10 select-none text-2xl opacity-80" aria-hidden>
+        ⋆˚࿔ ⚝
+      </div>
+      {/* Bottom center — discord / tiktok */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-3 z-10 flex items-center justify-center gap-2">
+        <a
+          href="https://discord.gg/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="pointer-events-auto prism-smooth flex items-center gap-1.5 rounded-full border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] text-muted-foreground backdrop-blur hover:border-primary/40 hover:text-foreground"
+        >
+          <MessageCircle className="h-3 w-3" /> discord
+        </a>
+        <a
+          href="https://tiktok.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="pointer-events-auto prism-smooth flex items-center gap-1.5 rounded-full border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] text-muted-foreground backdrop-blur hover:border-primary/40 hover:text-foreground"
+        >
+          tiktok
+        </a>
+      </div>
+      {/* Clock — bottom right */}
+      <div className="pointer-events-none absolute bottom-3 right-20 z-10 text-[11px] tabular-nums text-primary/90">
+        {time}
+      </div>
+    </>
   );
 }
+
 
 function BookmarksBar({
   bookmarks,
