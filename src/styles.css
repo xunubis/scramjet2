@@ -63,21 +63,22 @@
 
 :root {
   --radius: 0.625rem;
-  /* Calm desktop-OS theme — slate background, mint accent */
-  --background: oklch(0.18 0.015 250);
-  --foreground: oklch(0.96 0.005 250);
-  --card: oklch(0.22 0.015 250);
-  --card-foreground: oklch(0.96 0.005 250);
-  --popover: oklch(0.2 0.015 250);
-  --popover-foreground: oklch(0.96 0.005 250);
-  --primary: oklch(0.78 0.15 150);
-  --primary-foreground: oklch(0.18 0.015 250);
-  --secondary: oklch(0.26 0.015 250);
-  --secondary-foreground: oklch(0.96 0.005 250);
-  --muted: oklch(0.26 0.015 250);
-  --muted-foreground: oklch(0.72 0.01 250);
-  --accent: oklch(0.78 0.15 150);
-  --accent-foreground: oklch(0.18 0.015 250);
+  /* Mizu — deep violet night sky */
+  --background: oklch(0.13 0.04 295);
+  --foreground: oklch(0.96 0.02 295);
+  --card: oklch(0.17 0.05 295);
+  --card-foreground: oklch(0.96 0.02 295);
+  --popover: oklch(0.16 0.05 295);
+  --popover-foreground: oklch(0.96 0.02 295);
+  --primary: oklch(0.74 0.16 295);
+  --primary-foreground: oklch(0.13 0.04 295);
+  --secondary: oklch(0.22 0.05 295);
+  --secondary-foreground: oklch(0.96 0.02 295);
+  --muted: oklch(0.22 0.05 295);
+  --muted-foreground: oklch(0.75 0.05 295);
+  --accent: oklch(0.74 0.16 295);
+  --accent-foreground: oklch(0.13 0.04 295);
+
   --destructive: oklch(0.65 0.24 25);
   --destructive-foreground: oklch(0.984 0.003 247.858);
   --border: oklch(0.3 0.015 250);
@@ -156,13 +157,20 @@
 /* --- Truffled-style backdrop -------------------------------------------- */
 
 .prism-wallpaper {
-  background-color: oklch(0.16 0.012 240);
+  background-color: oklch(0.13 0.03 295);
   background-image:
-    linear-gradient(to right,  oklch(1 0 0 / 0.025) 1px, transparent 1px),
-    linear-gradient(to bottom, oklch(1 0 0 / 0.025) 1px, transparent 1px),
-    radial-gradient(ellipse at 50% 0%, oklch(0.26 0.04 220 / 0.5), transparent 65%);
-  background-size: 56px 56px, 56px 56px, 100% 100%;
+    radial-gradient(circle at 20% 15%, oklch(0.32 0.14 295 / 0.55), transparent 45%),
+    radial-gradient(circle at 82% 78%, oklch(0.28 0.16 285 / 0.55), transparent 50%),
+    radial-gradient(circle at 50% 50%, oklch(0.2 0.1 290 / 0.35), transparent 65%),
+    radial-gradient(1px 1px at 17% 22%, oklch(0.9 0.05 300 / 0.7) 99%, transparent 100%),
+    radial-gradient(1px 1px at 73% 41%, oklch(0.85 0.08 290 / 0.5) 99%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 44% 63%, oklch(0.95 0.02 295 / 0.6) 99%, transparent 100%),
+    radial-gradient(1px 1px at 88% 15%, oklch(0.88 0.06 300 / 0.55) 99%, transparent 100%),
+    radial-gradient(1px 1px at 12% 84%, oklch(0.9 0.05 295 / 0.5) 99%, transparent 100%),
+    linear-gradient(180deg, oklch(0.11 0.04 295) 0%, oklch(0.09 0.05 285) 100%);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 400px 400px, 520px 520px, 660px 660px, 480px 480px, 580px 580px, 100% 100%;
 }
+
 
 /* When a custom wallpaper image is set, layer it under the grid + vignette. */
 .prism-wallpaper[data-custom="1"] {

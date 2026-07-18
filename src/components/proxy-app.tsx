@@ -727,14 +727,53 @@ function SideRail({
 }
 
 function FooterLinks() {
+  const [now, setNow] = useState<Date | null>(null);
+  const [users, setUsers] = useState<number | null>(null);
+  useEffect(() => {
+    setNow(new Date());
+    setUsers(30 + Math.floor(Math.random() * 40));
+    const t = window.setInterval(() => setNow(new Date()), 1000 * 15);
+    return () => window.clearInterval(t);
+  }, []);
+  const time = now ? now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true }) : "";
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-3 z-10 flex items-center justify-center gap-6 text-xs text-muted-foreground/60">
-      <a href="#" className="pointer-events-auto prism-smooth hover:text-foreground">credits</a>
-      <span className="text-muted-foreground/30">/</span>
-      <a href="#" className="pointer-events-auto prism-smooth hover:text-foreground">dmca</a>
-    </div>
+    <>
+      {/* Online users — top left */}
+      <div className="pointer-events-none absolute left-3 top-2 z-10 flex items-center gap-1.5 text-[11px] text-primary/90">
+        <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
+        online users: {users}
+      </div>
+      {/* Mascot — bottom left */}
+      <div className="pointer-events-none absolute bottom-2 left-3 z-10 select-none text-2xl opacity-80" aria-hidden>
+        ⋆˚࿔ ⚝
+      </div>
+      {/* Bottom center — discord / tiktok */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-3 z-10 flex items-center justify-center gap-2">
+        <a
+          href="https://discord.gg/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="pointer-events-auto prism-smooth flex items-center gap-1.5 rounded-full border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] text-muted-foreground backdrop-blur hover:border-primary/40 hover:text-foreground"
+        >
+          <MessageCircle className="h-3 w-3" /> discord
+        </a>
+        <a
+          href="https://tiktok.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="pointer-events-auto prism-smooth flex items-center gap-1.5 rounded-full border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] text-muted-foreground backdrop-blur hover:border-primary/40 hover:text-foreground"
+        >
+          tiktok
+        </a>
+      </div>
+      {/* Clock — bottom right */}
+      <div className="pointer-events-none absolute bottom-3 right-20 z-10 text-[11px] tabular-nums text-primary/90">
+        {time}
+      </div>
+    </>
   );
 }
+
 
 function BookmarksBar({
   bookmarks,
@@ -860,99 +899,159 @@ function BlankTab({ onPick }: { onPick: (url: string) => void }) {
     }
   }
 
+  const [mode, setMode] = useState<"landing" | "search">("landing");
+
   return (
     <div className="relative flex h-full flex-col items-center justify-center px-6 text-center">
       <div
         className={
-          "prism-enter flex w-full max-w-3xl flex-col items-center " +
+          "prism-enter flex w-full max-w-2xl flex-col items-center " +
           (leaving ? "prism-leave" : "")
         }
       >
+        {/* Kanji title */}
         <h1
-          className="select-none text-6xl font-black tracking-tighter sm:text-8xl"
+          className="select-none text-6xl font-light tracking-tight sm:text-7xl"
           style={{
-            fontFamily: "var(--font-display)",
-            letterSpacing: "-0.06em",
-            background: "linear-gradient(180deg, oklch(0.98 0.01 250) 0%, oklch(0.7 0.02 250) 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
+            fontFamily: "'Noto Serif JP', 'Hiragino Mincho ProN', serif",
+            color: "var(--primary)",
+            textShadow: "0 0 40px color-mix(in oklab, var(--primary) 45%, transparent)",
           }}
+          aria-label="Prism"
         >
-          prism<span style={{ color: "var(--primary)", WebkitTextFillColor: "var(--primary)" }}>.</span>
+          プリズム
         </h1>
-        <p className="mt-3 text-xs uppercase tracking-[0.4em] text-muted-foreground/60">
-          a quiet doorway to the rest of the internet
+        <p className="mt-3 text-xs uppercase tracking-[0.5em] text-muted-foreground/80">
+          shift + space
+        </p>
+        <p className="mt-8 max-w-xs text-sm leading-relaxed text-muted-foreground/70">
+          a quiet doorway to the rest of the internet.
         </p>
 
-        <div className="relative mt-14 w-full">
-          <form
-            onSubmit={submit}
-            className="prism-smooth flex w-full items-center gap-3 rounded-2xl border border-white/5 bg-black/40 px-6 py-5 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.9)] backdrop-blur focus-within:border-white/15 focus-within:bg-black/50"
-          >
-            <input
-              ref={inputRef}
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              onKeyDown={onKeyDown}
-              onFocus={() => sugs.length > 0 && setOpen(true)}
-              onBlur={() => window.setTimeout(() => setOpen(false), 120)}
-              placeholder="Search DuckDuckGo or type an URL"
-              className="w-full bg-transparent text-center text-lg italic outline-none placeholder:text-muted-foreground/70"
-              autoFocus
-              spellCheck={false}
-            />
-          </form>
-
-          {open && (
-            <div
-              className="prism-enter absolute inset-x-0 top-full z-20 mt-2 overflow-hidden rounded-2xl border border-white/10 bg-popover/95 py-1.5 text-left shadow-[0_24px_70px_-30px_rgba(0,0,0,0.9)] backdrop-blur"
-              style={{ animationDuration: "180ms" }}
+        {/* Search input (revealed) */}
+        {mode === "search" && (
+          <div className="relative mt-8 w-full max-w-md">
+            <form
+              onSubmit={submit}
+              className="prism-smooth flex w-full items-center gap-3 rounded-full border border-white/10 bg-black/40 px-5 py-3 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.9)] backdrop-blur focus-within:border-primary/40"
             >
-              {sugs.map((s, i) => (
-                <button
-                  key={s}
-                  type="button"
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    go(s);
-                  }}
-                  onMouseEnter={() => setHi(i)}
-                  className={
-                    "prism-smooth flex w-full items-center gap-3 px-5 py-2.5 text-sm " +
-                    (i === hi
-                      ? "bg-white/[0.07] text-foreground"
-                      : "text-muted-foreground")
-                  }
-                >
-                  <Search className="h-3.5 w-3.5 shrink-0 opacity-60" />
-                  <span className="truncate">{s}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-        <p className="mt-3 text-sm text-muted-foreground/60">{ph}</p>
+              <Search className="h-4 w-4 shrink-0 opacity-60" />
+              <input
+                ref={inputRef}
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                onKeyDown={onKeyDown}
+                onFocus={() => sugs.length > 0 && setOpen(true)}
+                onBlur={() => window.setTimeout(() => setOpen(false), 120)}
+                placeholder={`search ${ph}`}
+                className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/60"
+                autoFocus
+                spellCheck={false}
+              />
+            </form>
 
-        <div className="mt-14 flex flex-wrap items-start justify-center gap-6">
+            {open && (
+              <div
+                className="prism-enter absolute inset-x-0 top-full z-20 mt-2 overflow-hidden rounded-2xl border border-white/10 bg-popover/95 py-1.5 text-left shadow-[0_24px_70px_-30px_rgba(0,0,0,0.9)] backdrop-blur"
+                style={{ animationDuration: "180ms" }}
+              >
+                {sugs.map((s, i) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      go(s);
+                    }}
+                    onMouseEnter={() => setHi(i)}
+                    className={
+                      "prism-smooth flex w-full items-center gap-3 px-5 py-2.5 text-sm " +
+                      (i === hi ? "bg-white/[0.07] text-foreground" : "text-muted-foreground")
+                    }
+                  >
+                    <Search className="h-3.5 w-3.5 shrink-0 opacity-60" />
+                    <span className="truncate">{s}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Pill buttons */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <button
+            onClick={() => {
+              setMode("search");
+              setTimeout(() => inputRef.current?.focus(), 50);
+            }}
+            className="prism-smooth flex items-center gap-2 rounded-full bg-primary/90 px-6 py-2.5 text-sm font-medium text-primary-foreground shadow-[0_10px_30px_-10px_color-mix(in_oklab,var(--primary)_60%,transparent)] hover:-translate-y-0.5 hover:bg-primary"
+          >
+            <Search className="h-4 w-4" />
+            browse
+          </button>
+          <Link
+            to="/apps"
+            className="prism-smooth flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-6 py-2.5 text-sm text-foreground backdrop-blur hover:-translate-y-0.5 hover:border-primary/40 hover:bg-black/50"
+          >
+            <Layers className="h-4 w-4" />
+            apps
+          </Link>
+          <Link
+            to="/games"
+            className="prism-smooth flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-6 py-2.5 text-sm text-foreground backdrop-blur hover:-translate-y-0.5 hover:border-primary/40 hover:bg-black/50"
+          >
+            <Gamepad2 className="h-4 w-4" />
+            games
+          </Link>
+        </div>
+
+        {/* Text links */}
+        <div className="mt-6 flex flex-col items-center gap-1.5 text-sm">
+          <button
+            onClick={() => {
+              setMode("search");
+              setTimeout(() => inputRef.current?.focus(), 50);
+            }}
+            className="prism-smooth text-primary/90 underline-offset-4 hover:text-primary hover:underline"
+          >
+            search
+          </button>
+          <Link to="/tools" className="prism-smooth text-primary/90 underline-offset-4 hover:text-primary hover:underline">
+            tools
+          </Link>
+          <Link to="/discord" className="prism-smooth text-primary/90 underline-offset-4 hover:text-primary hover:underline">
+            community
+          </Link>
+          <button
+            onClick={() => openAboutBlank()}
+            className="prism-smooth text-primary/90 underline-offset-4 hover:text-primary hover:underline"
+          >
+            about:blank
+          </button>
+        </div>
+
+        {/* Quick shortcuts */}
+        <div className="mt-10 flex flex-wrap items-start justify-center gap-5 opacity-80">
           {shortcuts.map((s) => (
             <button
               key={s.label}
               onClick={() => go(s.url)}
               onMouseEnter={() => prefetchTarget(s.url, loadSettings())}
               onFocus={() => prefetchTarget(s.url, loadSettings())}
-              className="prism-smooth group flex w-20 flex-col items-center gap-2"
+              className="prism-smooth group flex w-16 flex-col items-center gap-1.5"
             >
-              <span className="prism-smooth flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03] group-hover:-translate-y-0.5 group-hover:border-white/20 group-hover:bg-white/[0.06]">
+              <span className="prism-smooth flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] group-hover:-translate-y-0.5 group-hover:border-primary/40 group-hover:bg-primary/10">
                 <img
                   src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=64`}
                   alt=""
-                  width={32}
-                  height={32}
+                  width={22}
+                  height={22}
                   loading="lazy"
-                  className="h-8 w-8"
+                  className="h-5.5 w-5.5"
                 />
               </span>
-              <span className="text-xs text-muted-foreground group-hover:text-foreground">
+              <span className="text-[11px] text-muted-foreground group-hover:text-foreground">
                 {s.label}
               </span>
             </button>
@@ -962,6 +1061,7 @@ function BlankTab({ onPick }: { onPick: (url: string) => void }) {
     </div>
   );
 }
+
 
 function SettingsSheet({
   settings,
