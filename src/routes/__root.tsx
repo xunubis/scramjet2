@@ -92,6 +92,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500&display=swap" },
       // Preload proxy runtime so the first navigation is instant.
       { rel: "preload", as: "script", href: "/uv/uv.bundle.js" },
       { rel: "preload", as: "script", href: "/baremux/index.js" },
