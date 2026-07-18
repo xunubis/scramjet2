@@ -63,21 +63,22 @@
 
 :root {
   --radius: 0.625rem;
-  /* Calm desktop-OS theme — slate background, mint accent */
-  --background: oklch(0.18 0.015 250);
-  --foreground: oklch(0.96 0.005 250);
-  --card: oklch(0.22 0.015 250);
-  --card-foreground: oklch(0.96 0.005 250);
-  --popover: oklch(0.2 0.015 250);
-  --popover-foreground: oklch(0.96 0.005 250);
-  --primary: oklch(0.78 0.15 150);
-  --primary-foreground: oklch(0.18 0.015 250);
-  --secondary: oklch(0.26 0.015 250);
-  --secondary-foreground: oklch(0.96 0.005 250);
-  --muted: oklch(0.26 0.015 250);
-  --muted-foreground: oklch(0.72 0.01 250);
-  --accent: oklch(0.78 0.15 150);
-  --accent-foreground: oklch(0.18 0.015 250);
+  /* Mizu — deep violet night sky */
+  --background: oklch(0.13 0.04 295);
+  --foreground: oklch(0.96 0.02 295);
+  --card: oklch(0.17 0.05 295);
+  --card-foreground: oklch(0.96 0.02 295);
+  --popover: oklch(0.16 0.05 295);
+  --popover-foreground: oklch(0.96 0.02 295);
+  --primary: oklch(0.74 0.16 295);
+  --primary-foreground: oklch(0.13 0.04 295);
+  --secondary: oklch(0.22 0.05 295);
+  --secondary-foreground: oklch(0.96 0.02 295);
+  --muted: oklch(0.22 0.05 295);
+  --muted-foreground: oklch(0.75 0.05 295);
+  --accent: oklch(0.74 0.16 295);
+  --accent-foreground: oklch(0.13 0.04 295);
+
   --destructive: oklch(0.65 0.24 25);
   --destructive-foreground: oklch(0.984 0.003 247.858);
   --border: oklch(0.3 0.015 250);
