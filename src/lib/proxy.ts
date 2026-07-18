@@ -138,7 +138,7 @@ export const DEFAULT_SETTINGS: ProxySettings = {
   wispUrl: DEFAULT_WISP_URL,
   defaultEngine: "uv",
   reducedMotion: false,
-  accent: "mint",
+  accent: "violet",
   theme: "default",
   wallpaperUrl: "",
   performanceMode: "hover",
