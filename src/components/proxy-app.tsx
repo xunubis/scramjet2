@@ -727,13 +727,15 @@ function SideRail({
 }
 
 function FooterLinks() {
-  const [now, setNow] = useState(() => new Date());
-  const [users] = useState(() => 30 + Math.floor(Math.random() * 40));
+  const [now, setNow] = useState<Date | null>(null);
+  const [users, setUsers] = useState<number | null>(null);
   useEffect(() => {
+    setNow(new Date());
+    setUsers(30 + Math.floor(Math.random() * 40));
     const t = window.setInterval(() => setNow(new Date()), 1000 * 15);
     return () => window.clearInterval(t);
   }, []);
-  const time = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
+  const time = now ? now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true }) : "";
   return (
     <>
       {/* Online users — top left */}
